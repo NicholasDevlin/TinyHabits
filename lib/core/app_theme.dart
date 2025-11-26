@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  static TextStyle appTextStyle({
+    double? fontSize,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
+    return TextStyle(
+      fontFamily: 'Roboto',
+      fontSize: fontSize ?? 14,
+      fontWeight: fontWeight,
+      color: color,
+    );
+  }
   // Color Palette as specified in the instructions
   static const Color primaryColor = Color(0xFF85D8EA); // Light Cyan/Blue
   static const Color secondaryColor = Color(0xFF546A7B); // Blue Grey
   static const Color backgroundColor = Colors.white;
   static const Color lightBackgroundColor = Color(0xFFFAFAFA);
   static const Color successColor = Colors.green;
+  static const Color warningColor = Colors.orangeAccent;
   static const Color errorColor = Colors.red;
   static const Color surfaceColor = Colors.white;
 
@@ -22,11 +34,28 @@ class AppTheme {
         error: errorColor,
       ),
       scaffoldBackgroundColor: lightBackgroundColor,
-      textTheme: GoogleFonts.interTextTheme(),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(fontFamily: 'Roboto', fontSize: 57),
+        displayMedium: TextStyle(fontFamily: 'Roboto', fontSize: 45),
+        displaySmall: TextStyle(fontFamily: 'Roboto', fontSize: 36),
+        headlineLarge: TextStyle(fontFamily: 'Roboto', fontSize: 32),
+        headlineMedium: TextStyle(fontFamily: 'Roboto', fontSize: 28),
+        headlineSmall: TextStyle(fontFamily: 'Roboto', fontSize: 24),
+        titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22),
+        titleMedium: TextStyle(fontFamily: 'Roboto', fontSize: 16),
+        titleSmall: TextStyle(fontFamily: 'Roboto', fontSize: 14),
+        bodyLarge: TextStyle(fontFamily: 'Roboto', fontSize: 16),
+        bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 14),
+        bodySmall: TextStyle(fontFamily: 'Roboto', fontSize: 12),
+        labelLarge: TextStyle(fontFamily: 'Roboto', fontSize: 14),
+        labelMedium: TextStyle(fontFamily: 'Roboto', fontSize: 12),
+        labelSmall: TextStyle(fontFamily: 'Roboto', fontSize: 11),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: backgroundColor,
         elevation: 0,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: const TextStyle(
+          fontFamily: 'Roboto',
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: secondaryColor,

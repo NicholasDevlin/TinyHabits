@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app_theme.dart';
 import '../../domain/models/habit.dart';
@@ -7,12 +6,12 @@ import '../pages/habit_detail_page.dart';
 
 class HabitCard extends StatefulWidget {
   final Habit habit;
-  final Function(bool) onCompleted;
+  final Function(bool)? onCompleted;
 
   const HabitCard({
     super.key,
     required this.habit,
-    required this.onCompleted,
+    this.onCompleted,
   });
 
   @override
@@ -52,6 +51,8 @@ class _HabitCardState extends State<HabitCard>
 
   @override
   Widget build(BuildContext context) {
+    final isButtonEnabled = widget.onCompleted != null;
+
     return Hero(
       tag: 'habit_${widget.habit.id}',
       child: Card(
@@ -63,7 +64,7 @@ class _HabitCardState extends State<HabitCard>
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: _isCompleted 
+              color: _isCompleted
                   ? AppTheme.primaryColor.withOpacity(0.05)
                   : AppTheme.surfaceColor,
             ),
@@ -75,13 +76,14 @@ class _HabitCardState extends State<HabitCard>
                     children: [
                       Text(
                         widget.habit.title,
-                        style: GoogleFonts.inter(
+                        style: AppTheme.appTextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: _isCompleted 
+                          color: _isCompleted
                               ? AppTheme.secondaryColor.withOpacity(0.7)
                               : AppTheme.secondaryColor,
-                          decoration: _isCompleted 
+                        ).copyWith(
+                          decoration: _isCompleted
                               ? TextDecoration.lineThrough
                               : TextDecoration.none,
                         ),
@@ -90,10 +92,11 @@ class _HabitCardState extends State<HabitCard>
                         const SizedBox(height: 4),
                         Text(
                           widget.habit.description!,
-                          style: GoogleFonts.inter(
+                          style: AppTheme.appTextStyle(
                             fontSize: 14,
                             color: AppTheme.secondaryColor.withOpacity(0.6),
-                            decoration: _isCompleted 
+                          ).copyWith(
+                            decoration: _isCompleted
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,
                           ),
@@ -112,7 +115,7 @@ class _HabitCardState extends State<HabitCard>
                           const SizedBox(width: 4),
                           Text(
                             widget.habit.reminderTime,
-                            style: GoogleFonts.inter(
+                            style: AppTheme.appTextStyle(
                               fontSize: 12,
                               color: AppTheme.secondaryColor.withOpacity(0.5),
                             ),
@@ -127,7 +130,7 @@ class _HabitCardState extends State<HabitCard>
                             const SizedBox(width: 4),
                             Text(
                               '${widget.habit.currentStreak} day streak',
-                              style: GoogleFonts.inter(
+                              style: AppTheme.appTextStyle(
                                 fontSize: 12,
                                 color: Colors.orange,
                                 fontWeight: FontWeight.w500,
@@ -145,22 +148,26 @@ class _HabitCardState extends State<HabitCard>
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: GestureDetector(
-                    onTapDown: (_) => _animationController.forward(),
-                    onTapUp: (_) => _handleCheckTap(),
-                    onTapCancel: () => _animationController.reverse(),
+                    onTapDown: isButtonEnabled ? (_) => _animationController.forward() : null,
+                    onTapUp: isButtonEnabled ? (_) => _handleCheckTap() : null,
+                    onTapCancel: isButtonEnabled ? () => _animationController.reverse() : null,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: _isCompleted 
+                        color: _isCompleted
                             ? AppTheme.successColor
-                            : AppTheme.primaryColor.withOpacity(0.1),
+                            : isButtonEnabled
+                                ? AppTheme.primaryColor.withOpacity(0.1)
+                                : AppTheme.secondaryColor.withOpacity(0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: _isCompleted
                               ? AppTheme.successColor
-                              : AppTheme.primaryColor,
+                              : isButtonEnabled
+                                  ? AppTheme.primaryColor
+                                  : AppTheme.secondaryColor.withOpacity(0.3),
                           width: 2,
                         ),
                       ),
@@ -174,8 +181,10 @@ class _HabitCardState extends State<HabitCard>
                                 key: ValueKey('completed'),
                               )
                             : Icon(
-                                Icons.circle_outlined,
-                                color: AppTheme.primaryColor,
+                                isButtonEnabled ? Icons.circle_outlined : Icons.do_not_disturb,
+                                color: isButtonEnabled
+                                    ? AppTheme.primaryColor
+                                    : AppTheme.secondaryColor.withOpacity(0.4),
                                 size: 28,
                                 key: const ValueKey('incomplete'),
                               ),
@@ -202,7 +211,10 @@ class _HabitCardState extends State<HabitCard>
       _showCompletionAnimation();
     }
 
-    widget.onCompleted(_isCompleted);
+    // Only call onCompleted if it's not null
+    if (widget.onCompleted != null) {
+      widget.onCompleted!(_isCompleted);
+    }
   }
 
   void _showCompletionAnimation() {

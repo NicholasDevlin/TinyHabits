@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app_theme.dart';
 import '../../domain/models/habit.dart';
 import '../providers/habit_providers.dart';
 
 class CreateHabitPage extends ConsumerStatefulWidget {
-  const CreateHabitPage({super.key});
+  final Habit? habit;
+
+  const CreateHabitPage({super.key, this.habit});
 
   @override
   ConsumerState<CreateHabitPage> createState() => _CreateHabitPageState();
@@ -32,6 +33,29 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+
+    // If editing an existing habit, populate the form
+    if (widget.habit != null) {
+      _titleController.text = widget.habit!.title;
+      if (widget.habit!.description != null) {
+        _descriptionController.text = widget.habit!.description!;
+      }
+
+      // Parse reminder time
+      final timeParts = widget.habit!.reminderTime.split(':');
+      _selectedTime = TimeOfDay(
+        hour: int.parse(timeParts[0]),
+        minute: int.parse(timeParts[1]),
+      );
+
+      // Set selected days
+      _selectedDays = widget.habit!.targetDays.toSet();
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
@@ -45,8 +69,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Create Habit',
-          style: GoogleFonts.inter(
+          widget.habit != null ? 'Edit Habit' : 'Create Habit',
+          style: AppTheme.appTextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
             color: AppTheme.secondaryColor,
@@ -74,8 +98,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               ),
             ),
             child: Text(
-              'Create Habit',
-              style: GoogleFonts.inter(
+              widget.habit != null ? 'Update Habit' : 'Create Habit',
+              style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -96,7 +120,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
           children: [
             Text(
               'Habit Name',
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.secondaryColor,
@@ -123,7 +147,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             Text(
               'Description (Optional)',
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.secondaryColor,
@@ -144,7 +168,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             Text(
               'Reminder Time',
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.secondaryColor,
@@ -174,7 +198,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
                     Text(
                       _formatTime(_selectedTime),
-                      style: GoogleFonts.inter(
+                      style: AppTheme.appTextStyle(
                         fontSize: 16,
                         color: AppTheme.secondaryColor,
                       ),
@@ -196,7 +220,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             Text(
               'Repeat Days',
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.secondaryColor,
@@ -208,7 +232,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
             CheckboxListTile(
               title: Text(
                 'Everyday',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                style: AppTheme.appTextStyle(fontWeight: FontWeight.w500),
               ),
               value: _selectedDays.length == 7,
               onChanged: (value) {
@@ -263,7 +287,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
               Text(
                 'Please select at least one day',
-                style: GoogleFonts.inter(
+                style: AppTheme.appTextStyle(
                   fontSize: 12,
                   color: AppTheme.errorColor,
                 ),
@@ -323,30 +347,44 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
     final request = CreateHabitRequest(
       title: _titleController.text.trim(),
-      description: _descriptionController.text.trim().isEmpty 
-          ? null 
+      description: _descriptionController.text.trim().isEmpty
+          ? null
           : _descriptionController.text.trim(),
       reminderTime: _formatTime(_selectedTime),
       targetDays: _selectedDays.toList()..sort(),
     );
 
     try {
-      await ref.read(habitControllerProvider.notifier).createHabit(request);
+      if (widget.habit != null) {
+        await ref.read(habitControllerProvider.notifier).updateHabit(widget.habit!.id, request);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Habit created successfully! 🎉'),
-            backgroundColor: AppTheme.successColor,
-          ),
-        );
-        Navigator.of(context).pop();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Habit updated successfully! 🎉'),
+              backgroundColor: AppTheme.successColor,
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      } else {
+        await ref.read(habitControllerProvider.notifier).createHabit(request);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Habit created successfully! 🎉'),
+              backgroundColor: AppTheme.successColor,
+            ),
+          );
+          Navigator.of(context).pop();
+        }
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to create habit: $error'),
+            content: Text('Failed to ${widget.habit != null ? 'update' : 'create'} habit: $error'),
             backgroundColor: AppTheme.errorColor,
           ),
         );

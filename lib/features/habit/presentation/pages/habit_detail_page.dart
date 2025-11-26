@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../core/app_theme.dart';
@@ -25,7 +24,7 @@ class HabitDetailPage extends ConsumerWidget {
         title: habitAsync.when(
           data: (habit) => Text(
             habit?.title ?? 'Habit Details',
-            style: GoogleFonts.inter(
+            style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -33,7 +32,7 @@ class HabitDetailPage extends ConsumerWidget {
           ),
           loading: () => Text(
             'Loading...',
-            style: GoogleFonts.inter(
+            style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -41,7 +40,7 @@ class HabitDetailPage extends ConsumerWidget {
           ),
           error: (_, __) => Text(
             'Error',
-            style: GoogleFonts.inter(
+            style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -93,7 +92,7 @@ class HabitDetailPage extends ConsumerWidget {
                     children: [
                       Text(
                         habit.title,
-                        style: GoogleFonts.inter(
+                        style: AppTheme.appTextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.secondaryColor,
@@ -105,7 +104,7 @@ class HabitDetailPage extends ConsumerWidget {
 
                         Text(
                           habit.description!,
-                          style: GoogleFonts.inter(
+                          style: AppTheme.appTextStyle(
                             fontSize: 16,
                             color: AppTheme.secondaryColor.withOpacity(0.7),
                           ),
@@ -126,7 +125,7 @@ class HabitDetailPage extends ConsumerWidget {
 
                           Text(
                             'Reminder at ${habit.reminderTime}',
-                            style: GoogleFonts.inter(
+                            style: AppTheme.appTextStyle(
                               fontSize: 14,
                               color: AppTheme.secondaryColor.withOpacity(0.7),
                             ),
@@ -148,7 +147,7 @@ class HabitDetailPage extends ConsumerWidget {
 
                           Text(
                             _formatTargetDays(habit.targetDays),
-                            style: GoogleFonts.inter(
+                            style: AppTheme.appTextStyle(
                               fontSize: 14,
                               color: AppTheme.secondaryColor.withOpacity(0.7),
                             ),
@@ -166,7 +165,7 @@ class HabitDetailPage extends ConsumerWidget {
 
           Text(
             'Statistics',
-            style: GoogleFonts.inter(
+            style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -205,7 +204,7 @@ class HabitDetailPage extends ConsumerWidget {
 
           Text(
             'Calendar',
-            style: GoogleFonts.inter(
+            style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -248,7 +247,7 @@ class HabitDetailPage extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: AppTheme.appTextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.secondaryColor.withOpacity(0.7),
@@ -262,7 +261,7 @@ class HabitDetailPage extends ConsumerWidget {
 
             Text(
               value,
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.secondaryColor,
@@ -271,7 +270,7 @@ class HabitDetailPage extends ConsumerWidget {
 
             Text(
               unit,
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 12,
                 color: AppTheme.secondaryColor.withOpacity(0.5),
               ),
@@ -314,17 +313,17 @@ class HabitDetailPage extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
             // Default day style
-            defaultTextStyle: GoogleFonts.inter(
+            defaultTextStyle: AppTheme.appTextStyle(
               color: AppTheme.secondaryColor,
             ),
-            weekendTextStyle: GoogleFonts.inter(
+            weekendTextStyle: AppTheme.appTextStyle(
               color: AppTheme.secondaryColor.withOpacity(0.7),
             ),
           ),
           headerStyle: HeaderStyle(
             formatButtonVisible: false,
             titleCentered: true,
-            titleTextStyle: GoogleFonts.inter(
+            titleTextStyle: AppTheme.appTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
@@ -339,11 +338,11 @@ class HabitDetailPage extends ConsumerWidget {
             ),
           ),
           daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: GoogleFonts.inter(
+            weekdayStyle: AppTheme.appTextStyle(
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
             ),
-            weekendStyle: GoogleFonts.inter(
+            weekendStyle: AppTheme.appTextStyle(
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor.withOpacity(0.7),
             ),
@@ -393,7 +392,7 @@ class HabitDetailPage extends ConsumerWidget {
 
             Text(
               'Oops!',
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.secondaryColor,
@@ -405,7 +404,7 @@ class HabitDetailPage extends ConsumerWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: AppTheme.appTextStyle(
                 fontSize: 14,
                 color: AppTheme.secondaryColor.withOpacity(0.7),
               ),
@@ -433,18 +432,18 @@ class HabitDetailPage extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: Text(
           'Delete Habit',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          style: AppTheme.appTextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Are you sure you want to delete this habit? This action cannot be undone.',
-          style: GoogleFonts.inter(),
+          style: AppTheme.appTextStyle(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: AppTheme.secondaryColor),
+              style: AppTheme.appTextStyle(color: AppTheme.secondaryColor),
             ),
           ),
 
@@ -477,7 +476,7 @@ class HabitDetailPage extends ConsumerWidget {
             },
             child: Text(
               'Delete',
-              style: GoogleFonts.inter(color: AppTheme.errorColor),
+              style: AppTheme.appTextStyle(color: AppTheme.errorColor),
             ),
           ),
         ],

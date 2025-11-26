@@ -50,7 +50,7 @@ class HabitController extends _$HabitController {
     try {
       final repository = ref.read(habitRepositoryProvider);
       final habitId = await repository.createHabit(request);
-      
+
       // Schedule notifications for the new habit
       await NotificationService.scheduleHabitReminder(
         habitId: habitId,
@@ -58,7 +58,7 @@ class HabitController extends _$HabitController {
         reminderTime: request.reminderTime,
         targetDays: request.targetDays,
       );
-      
+
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
       ref.invalidate(allHabitsProvider);
@@ -74,19 +74,59 @@ class HabitController extends _$HabitController {
       final repository = ref.read(habitRepositoryProvider);
       final today = DateTime.now();
       await repository.markHabitCompleted(habitId, today, isCompleted);
-      
-      
+
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
       ref.invalidate(allHabitsProvider);
       ref.invalidate(habitProvider(habitId));
       ref.invalidate(habitCompletedDatesProvider(habitId));
     } catch (error) {
-      // Handle error silently or show a snackbar
       rethrow;
     }
   }
 
+  Future<void> updateHabit(int habitId, CreateHabitRequest request) async {
+    state = const AsyncLoading();
+    try {
+      final repository = ref.read(habitRepositoryProvider);
+
+      final existingHabit = await repository.getHabitById(habitId);
+      if (existingHabit == null) {
+        throw Exception('Habit not found');
+      }
+
+      final updatedHabit = Habit(
+        id: habitId,
+        title: request.title,
+        description: request.description,
+        reminderTime: request.reminderTime,
+        targetDays: request.targetDays,
+        createdAt: existingHabit.createdAt,
+        isCompletedToday: existingHabit.isCompletedToday,
+        currentStreak: existingHabit.currentStreak,
+        totalCompletions: existingHabit.totalCompletions,
+      );
+
+      await repository.updateHabit(updatedHabit);
+
+      // Reschedule notifications for the updated habit
+      await NotificationService.rescheduleHabitReminder(
+        habitId: habitId,
+        habitTitle: request.title,
+        reminderTime: request.reminderTime,
+        targetDays: request.targetDays,
+      );
+
+      // Invalidate providers to refresh the UI
+      ref.invalidate(todayHabitsProvider);
+      ref.invalidate(allHabitsProvider);
+      ref.invalidate(habitProvider(habitId));
+
+      state = const AsyncData(null);
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
 
   Future<void> deleteHabit(int habitId) async {
     state = const AsyncLoading();

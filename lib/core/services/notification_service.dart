@@ -3,51 +3,71 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
-
   static bool _isInitialized = false;
+
+  // Constants for better maintainability
+  static const String _habitChannelId = 'habit_reminders';
+  static const String _habitChannelName = 'Habit Reminders';
+  static const String _habitChannelDescription = 'Scheduled reminders for your habits';
+  static const Color _primaryColor = Color(0xFF85D8EA);
+  static final Int64List _vibrationPattern = Int64List.fromList([0, 1000, 500, 1000]);
 
   static Future<void> initialize() async {
     if (_isInitialized) return;
 
-    // Request notification permission
-    await _requestPermissions();
+    try {
+      tz.initializeTimeZones();
 
-    // Initialize plugin
-    const initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+      await _requestPermissions();
 
-    const initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
+      // Initialize plugin with iOS and Android settings
+      const initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    await _notifications.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: _onNotificationTapped,
-    );
+      const initializationSettingsIOS = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
 
-    // Create notification channels explicitly
-    await _createNotificationChannels();
+      const initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
 
-    _isInitialized = true;
+      final initialized = await _notifications.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: _onNotificationTapped,
+      );
+
+      if (initialized == null || !initialized) {
+        throw Exception('Failed to initialize notification plugin');
+      }
+
+      await _createNotificationChannels();
+
+      _isInitialized = true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<void> _createNotificationChannels() async {
-    final vibrationPattern = Int64List.fromList([0, 1000, 500, 1000]);
     final habitRemindersChannel = AndroidNotificationChannel(
-      'habit_reminders',
-      'Habit Reminders',
-      description: 'Scheduled reminders for your habits - works like an alarm',
-      importance: Importance.max, // Changed to max for alarm-like behavior
+      _habitChannelId,
+      _habitChannelName,
+      description: _habitChannelDescription,
+      importance: Importance.max,
       enableVibration: true,
       playSound: true,
       enableLights: true,
-      ledColor: const Color(0xFF85D8EA),
-      vibrationPattern: vibrationPattern,
+      ledColor: _primaryColor,
+      vibrationPattern: _vibrationPattern,
     );
 
-    // Actually create the channel
     await _notifications
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(habitRemindersChannel);
@@ -69,49 +89,51 @@ class NotificationService {
   static Future<void> scheduleHabitReminder({
     required int habitId,
     required String habitTitle,
-    required String reminderTime, // "HH:mm" format
-    required List<int> targetDays, // 1-7 (Monday to Sunday)
+    required String reminderTime,
+    required List<int> targetDays,
   }) async {
-    if (!_isInitialized) await initialize();
+    try {
+      if (!_isInitialized) await initialize();
 
-    final reminderTimeParts = reminderTime.split(':');
-    final hour = int.parse(reminderTimeParts[0]);
-    final minute = int.parse(reminderTimeParts[1]);
+      final timeParts = _parseReminderTime(reminderTime);
+      await _scheduleNotificationsForDays(
+        habitId: habitId,
+        habitTitle: habitTitle,
+        reminderTime: reminderTime,
+        targetDays: targetDays,
+        hour: timeParts.hour,
+        minute: timeParts.minute,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    // Schedule notification for each target day
-    for (int dayOfWeek in targetDays) {
+  static ({int hour, int minute}) _parseReminderTime(String reminderTime) {
+    final parts = reminderTime.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+
+    return (hour: hour, minute: minute);
+  }
+
+  static Future _scheduleNotificationsForDays({
+    required int habitId,
+    required String habitTitle,
+    required String reminderTime,
+    required List<int> targetDays,
+    required int hour,
+    required int minute,
+  }) async {
+    for (final dayOfWeek in targetDays) {
       final notificationId = _generateNotificationId(habitId, dayOfWeek);
 
-      final scheduledTime = _nextInstanceOfWeekdayAndTime(dayOfWeek, hour, minute);
-      final dayName = _getDayName(dayOfWeek);
-      
       await _notifications.zonedSchedule(
         notificationId,
         'Time for your habit! 🎯',
-        '$habitTitle - Every $dayName at $reminderTime',
-        scheduledTime,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'habit_reminders',
-            'Habit Reminders',
-            channelDescription: 'Scheduled reminders for your habits - works like an alarm',
-            importance: Importance.max, // Maximum importance for alarm-like behavior
-            priority: Priority.max, // Maximum priority
-            icon: '@mipmap/ic_launcher',
-            color: const Color(0xFF85D8EA),
-            playSound: true,
-            enableVibration: true,
-            vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]), // Custom vibration pattern
-            enableLights: true,
-            ledColor: Color(0xFF85D8EA),
-            ledOnMs: 1000,
-            ledOffMs: 500,
-            autoCancel: false, // Don't auto-cancel so user has to interact
-            ongoing: false, // Not ongoing, but persistent until dismissed
-            showWhen: true,
-            when: scheduledTime.millisecondsSinceEpoch,
-          ),
-        ),
+        habitTitle,
+        _getNextOccurrence(dayOfWeek, hour, minute),
+        _buildNotificationDetails(),
         payload: 'habit_$habitId',
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -119,35 +141,39 @@ class NotificationService {
     }
   }
 
+  static NotificationDetails _buildNotificationDetails() {
+    return NotificationDetails(
+      android: AndroidNotificationDetails(
+        _habitChannelId,
+        _habitChannelName,
+        channelDescription: _habitChannelDescription,
+        importance: Importance.max,
+        priority: Priority.max,
+        icon: '@mipmap/ic_launcher',
+        color: _primaryColor,
+        vibrationPattern: _vibrationPattern,
+        autoCancel: false,
+        category: AndroidNotificationCategory.reminder,
+        fullScreenIntent: true,
+        visibility: NotificationVisibility.public,
+      ),
+    );
+  }
+
   static Future<void> cancelHabitReminders(int habitId) async {
-    // Cancel all notifications for this habit (for all days)
     for (int dayOfWeek = 1; dayOfWeek <= 7; dayOfWeek++) {
       final notificationId = _generateNotificationId(habitId, dayOfWeek);
       await _notifications.cancel(notificationId);
     }
   }
 
-  /// Cancel all pending notifications
-  static Future<void> cancelAllNotifications() async {
-    await _notifications.cancelAll();
-  }
-
-  /// Get list of pending notifications (for debugging)
-  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    return await _notifications.pendingNotificationRequests();
-  }
-
-  /// Reschedule all notifications for a habit (useful when updating)
   static Future<void> rescheduleHabitReminder({
     required int habitId,
     required String habitTitle,
     required String reminderTime,
     required List<int> targetDays,
   }) async {
-    // Cancel existing notifications first
     await cancelHabitReminders(habitId);
-    
-    // Schedule new notifications
     await scheduleHabitReminder(
       habitId: habitId,
       habitTitle: habitTitle,
@@ -156,54 +182,19 @@ class NotificationService {
     );
   }
 
-  /// Debug method to get scheduled times for a habit
-  static Map<String, DateTime> getScheduledTimesForHabit({
-    required String reminderTime,
-    required List<int> targetDays,
-  }) {
-    final reminderTimeParts = reminderTime.split(':');
-    final hour = int.parse(reminderTimeParts[0]);
-    final minute = int.parse(reminderTimeParts[1]);
-
-    final Map<String, DateTime> scheduledTimes = {};
-    
-    for (int dayOfWeek in targetDays) {
-      final dayName = _getDayName(dayOfWeek);
-      final scheduledTime = _nextInstanceOfWeekdayAndTime(dayOfWeek, hour, minute);
-      scheduledTimes[dayName] = scheduledTime.toLocal();
-    }
-
-    return scheduledTimes;
-  }
-
   static int _generateNotificationId(int habitId, int dayOfWeek) {
     return habitId * 10 + dayOfWeek;
   }
 
   static String _getDayName(int dayOfWeek) {
-    switch (dayOfWeek) {
-      case 1:
-        return 'Monday';
-      case 2:
-        return 'Tuesday';
-      case 3:
-        return 'Wednesday';
-      case 4:
-        return 'Thursday';
-      case 5:
-        return 'Friday';
-      case 6:
-        return 'Saturday';
-      case 7:
-        return 'Sunday';
-      default:
-        return 'Unknown';
-    }
+    const dayNames = ['Unknown', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    return dayNames[dayOfWeek];
   }
 
-  static tz.TZDateTime _nextInstanceOfWeekdayAndTime(int weekday, int hour, int minute) {
-    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+  static tz.TZDateTime _getNextOccurrence(int weekday, int hour, int minute) {
+    final now = DateTime.now();
+    DateTime scheduledDate = DateTime(now.year, now.month, now.day, hour, minute);
 
     // Calculate next occurrence of the specified weekday
     final currentWeekday = now.weekday;
@@ -212,15 +203,13 @@ class NotificationService {
     // If it's the same day but the time has already passed, schedule for next week
     if (daysUntilTarget == 0 && scheduledDate.isBefore(now)) {
       daysUntilTarget = 7;
-    }
-    
-    // If the target day is in the past this week, schedule for next week
-    if (daysUntilTarget < 0) {
+    } else if (daysUntilTarget < 0) { // If the target day is in the past this week, schedule for next week
       daysUntilTarget += 7;
     }
 
     scheduledDate = scheduledDate.add(Duration(days: daysUntilTarget));
 
-    return scheduledDate;
+    // Convert to TZDateTime using local timezone (system timezone)
+    return tz.TZDateTime.from(scheduledDate, tz.local);
   }
 }
