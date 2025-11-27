@@ -16,6 +16,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final Set<int> _dismissedHabitIds = <int>{};
 
   @override
   void initState() {
@@ -26,6 +27,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   @override
   void dispose() {
     _tabController.dispose();
+    _dismissedHabitIds.clear();
     super.dispose();
   }
 
@@ -104,7 +106,9 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   }
 
   Widget _buildHabitsList(BuildContext context, WidgetRef ref, List<Habit> habits, {required bool isTodayTab}) {
-    if (habits.isEmpty) {
+    final visibleHabits = habits.where((habit) => !_dismissedHabitIds.contains(habit.id)).toList();
+
+    if (visibleHabits.isEmpty) {
       return _buildEmptyState(context, isTodayTab);
     }
 
@@ -126,7 +130,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
           if (isTodayTab) ...[
             Text(
-              _getMotivationalText(habits),
+              _getMotivationalText(visibleHabits),
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 color: AppTheme.secondaryColor.withOpacity(0.7),
@@ -139,15 +143,15 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
           Expanded(
             child: ListView.builder(
-              itemCount: habits.length,
+              itemCount: visibleHabits.length,
               itemBuilder: (context, index) {
-                final habit = habits[index];
+                final habit = visibleHabits[index];
                 final isAvailableToday = _isHabitAvailableToday(habit);
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: Dismissible(
-                    key: ValueKey('habit_${habit.id}_${habit.createdAt.millisecondsSinceEpoch}'),
+                    key: ValueKey('habit_${habit.id}'),
                     direction: DismissDirection.horizontal,
                     background: Container(
                       decoration: BoxDecoration(
@@ -216,6 +220,11 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                       if (direction == DismissDirection.endToStart) {
                         final deletedHabit = habit; // Keep a copy for undo
 
+                        // Immediately remove the widget from the list to prevent Dismissible errors
+                        setState(() {
+                          _dismissedHabitIds.add(habit.id);
+                        });
+
                         // Show immediate feedback
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -255,6 +264,11 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                             ),
                           );
                         } catch (e) {
+                          // Restore the habit in the list if deletion failed
+                          setState(() {
+                            _dismissedHabitIds.remove(habit.id);
+                          });
+
                           if (!context.mounted) return;
 
                           ScaffoldMessenger.of(context).hideCurrentSnackBar();

@@ -37,6 +37,9 @@ Future<List<DateTime>> habitCompletedDates(HabitCompletedDatesRef ref, int habit
   return await repository.getCompletedDates(habitId);
 }
 
+// Global set to track ongoing deletions to prevent duplicates
+final Set<int> _ongoingDeletions = <int>{};
+
 // Habit controller for managing habit operations
 @riverpod
 class HabitController extends _$HabitController {
@@ -129,7 +132,14 @@ class HabitController extends _$HabitController {
   }
 
   Future<void> deleteHabit(int habitId) async {
-    state = const AsyncLoading();
+    // Prevent concurrent deletions of the same habit using global tracking
+    if (_ongoingDeletions.contains(habitId)) {
+      return;
+    }
+
+    // Mark this habit as being deleted
+    _ongoingDeletions.add(habitId);
+
     try {
       final repository = ref.read(habitRepositoryProvider);
 
@@ -142,9 +152,11 @@ class HabitController extends _$HabitController {
       ref.invalidate(todayHabitsProvider);
       ref.invalidate(allHabitsProvider);
 
-      state = const AsyncData(null);
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
+    } finally {
+      // Always remove the habit from ongoing deletions
+      _ongoingDeletions.remove(habitId);
     }
   }
 }

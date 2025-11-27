@@ -130,8 +130,8 @@ class NotificationService {
 
       await _notifications.zonedSchedule(
         notificationId,
-        'Time for your habit! 🎯',
         habitTitle,
+        'Time for your habit! 🎯',
         _getNextOccurrence(dayOfWeek, hour, minute),
         _buildNotificationDetails(),
         payload: 'habit_$habitId',
@@ -180,16 +180,14 @@ class NotificationService {
       reminderTime: reminderTime,
       targetDays: targetDays,
     );
+    try {
+    } catch (e) {
+      rethrow; // Let the caller handle this since rescheduling is critical
+    }
   }
 
   static int _generateNotificationId(int habitId, int dayOfWeek) {
     return habitId * 10 + dayOfWeek;
-  }
-
-  static String _getDayName(int dayOfWeek) {
-    const dayNames = ['Unknown', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-    return dayNames[dayOfWeek];
   }
 
   static tz.TZDateTime _getNextOccurrence(int weekday, int hour, int minute) {
