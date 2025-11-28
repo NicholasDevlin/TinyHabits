@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The main background (transparent) -->
+    <item android:drawable="@android:color/transparent" />
+
+    <!-- The divider line at the bottom -->
+    <item android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#D0D0D0" />
+            <size android:height="1dp" />
+        </shape>
+    </item>
+</layer-list>
