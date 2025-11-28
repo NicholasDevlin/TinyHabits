@@ -31,8 +31,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
 
   # Home Screen Widget
-  # home_widget: ^0.4.1
-  # workmanager: ^0.9.0+3
+  home_widget: ^0.8.1
+  workmanager: ^0.9.0+3
   shared_preferences: ^2.2.2
 
   # Utilities

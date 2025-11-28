@@ -8,6 +8,7 @@ import 'features/habit/presentation/pages/home_page.dart';
 import 'core/database/app_database.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/simple_widget_service.dart';
+import 'core/services/widget_action_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,11 @@ class TinyWinsApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Initialize simple widget service
     final widgetInit = ref.watch(simpleWidgetInitializationProvider);
+
+    // Initialize widget action handler with provider container
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetActionHandler.initialize(ProviderScope.containerOf(context));
+    });
 
     return MaterialApp(
       title: 'TinyWins',

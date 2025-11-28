@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.LinearLayout;
@@ -17,6 +18,9 @@ import android.widget.CheckBox;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.MethodChannel;
 // import androidx.work.WorkManager;
 
 import java.text.SimpleDateFormat;
@@ -176,19 +180,31 @@ public class HabitWidgetProvider extends AppWidgetProvider {
     }
 
     private void toggleHabitCompletion(Context context, int habitId) {
-        // This will be handled by the Flutter side through the home_widget package
-        // For now, we just trigger a widget update
-        Intent intent = new Intent(context, HabitWidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        context.sendBroadcast(intent);
+        // Start MainActivity with habit action data
+        Intent mainIntent = new Intent(context, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mainIntent.putExtra("widget_habit_id", habitId);
+        mainIntent.putExtra("widget_action", "toggle_habit");
+        context.startActivity(mainIntent);
+
+        // Also trigger widget update
+        Intent updateIntent = new Intent(context, HabitWidgetProvider.class);
+        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        context.sendBroadcast(updateIntent);
     }
 
     private void markHabitComplete(Context context, int habitId) {
-        // This will be handled by the Flutter side through the home_widget package
-        // For now, we just trigger a widget update
-        Intent intent = new Intent(context, HabitWidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        context.sendBroadcast(intent);
+        // Start MainActivity with habit action data
+        Intent mainIntent = new Intent(context, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mainIntent.putExtra("widget_habit_id", habitId);
+        mainIntent.putExtra("widget_action", "mark_complete");
+        context.startActivity(mainIntent);
+
+        // Also trigger widget update
+        Intent updateIntent = new Intent(context, HabitWidgetProvider.class);
+        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        context.sendBroadcast(updateIntent);
     }
 
     @Override

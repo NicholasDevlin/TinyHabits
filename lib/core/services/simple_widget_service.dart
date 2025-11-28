@@ -1,32 +1,71 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../database/app_database.dart';
+import 'package:home_widget/home_widget.dart';
 import '../../features/habit/domain/repositories/habit_widget_repository.dart';
 import '../../features/habit/data/repositories/habit_widget_repository_impl.dart';
+import '../../features/habit/domain/models/habit_widget.dart';
 
 class SimpleWidgetService {
   final HabitWidgetRepository _widgetRepository;
   bool _isInitialized = false;
   static const String _widgetDataKey = 'tinywins_habits_widget_data';
+  static const MethodChannel _widgetChannel = MethodChannel('com.example.tiny_wins/widget');
 
   // Singleton instance
   static SimpleWidgetService? _instance;
 
-  SimpleWidgetService._(this._widgetRepository);
+  SimpleWidgetService._(this._widgetRepository) {
+    _setupMethodChannel();
+  }
 
   factory SimpleWidgetService(HabitWidgetRepository widgetRepository) {
     return _instance ??= SimpleWidgetService._(widgetRepository);
   }
 
+  void _setupMethodChannel() {
+    _widgetChannel.setMethodCallHandler((MethodCall call) async {
+      switch (call.method) {
+        case 'onHabitWidgetClicked':
+          final int habitId = call.arguments['habitId'];
+          await _handleHabitWidgetClick(habitId);
+          break;
+        default:
+          throw PlatformException(code: 'Unimplemented', details: 'Method ${call.method} not implemented');
+      }
+    });
+  }
+
+  Future<void> _handleHabitWidgetClick(int habitId) async {
+    try {
+      // Get the habit to check current completion status
+      final habits = await _widgetRepository.getTodayHabitsForWidget();
+      final targetHabit = habits.cast<WidgetHabit?>().firstWhere((h) => h?.id == habitId, orElse: () => null);
+
+      if (targetHabit == null) {
+        return;
+      }
+
+      // Toggle completion status
+      final newCompletionStatus = !targetHabit.isCompletedToday;
+
+      // Mark habit as completed using widget repository
+      await _widgetRepository.updateHabitCompletionFromWidget(habitId, newCompletionStatus);
+
+      // Update widget to reflect changes
+      await updateWidgetData();
+    } catch (e) {
+      print('Error handling widget click for habit $habitId: $e');
+    }
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) {
-      print('SimpleWidgetService already initialized, skipping...');
       return;
     }
 
-    print('SimpleWidgetService initialized');
     _isInitialized = true;
     // Initial widget data update
     await updateWidgetData();
@@ -34,7 +73,6 @@ class SimpleWidgetService {
 
   Future<void> updateWidgetData() async {
     try {
-      // Get today's habits
       final habits = await _widgetRepository.getTodayHabitsForWidget();
       final completedCount = habits.where((h) => h.isCompletedToday).length;
 
@@ -62,11 +100,15 @@ class SimpleWidgetService {
       // Also save with the flutter. prefix for compatibility with Android widget
       await prefs.setString('flutter.$_widgetDataKey', jsonEncode(widgetData));
 
-      print('Widget data updated: ${habits.length} habits, $completedCount completed');
+      // Update home_widget for actual home screen widget updates
+      await HomeWidget.updateWidget(
+        name: 'HabitHomeWidget',
+        androidName: 'HabitWidgetProvider',
+        iOSName: 'TinyWinsWidget',
+      );
 
       // Also update the repository's data
       await _widgetRepository.refreshWidget();
-
     } catch (e) {
       print('Error updating widget data: $e');
     }
@@ -78,7 +120,6 @@ class SimpleWidgetService {
       for (int widgetId = 0; widgetId < 10; widgetId++) {
         await prefs.remove('flutter.HabitWidgetPrefs_$widgetId.widget_data');
       }
-      print('Cleaned up old widget data entries');
     } catch (e) {
       print('Error cleaning up old widget data: $e');
     }
@@ -111,8 +152,6 @@ final simpleWidgetServiceProvider = Provider<SimpleWidgetService>((ref) {
 
   // Use singleton to prevent multiple instances
   final service = SimpleWidgetService(widgetRepository);
-
-  // Don't dispose in provider since it's a singleton managed elsewhere
 
   return service;
 });
