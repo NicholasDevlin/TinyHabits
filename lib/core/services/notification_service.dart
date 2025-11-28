@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -16,10 +17,13 @@ class NotificationService {
   static const Color _primaryColor = Color(0xFF85D8EA);
   static final Int64List _vibrationPattern = Int64List.fromList([0, 1000, 500, 1000]);
 
-  static Future<void> initialize() async {
+  static Future<void> initialize({Function(int habitId, String action)? onHabitActionCallback}) async {
     if (_isInitialized) return;
 
     try {
+      // Set the callback for handling habit actions
+      _onHabitActionCallback = onHabitActionCallback;
+
       tz.initializeTimeZones();
 
       await _requestPermissions();
@@ -82,8 +86,59 @@ class NotificationService {
   }
 
   static Future<void> _onNotificationTapped(NotificationResponse response) async {
+    print('DEBUG: Notification tapped: ${response.payload}');
+    print('DEBUG: Action ID: ${response.actionId}');
+
+    // Parse the payload to extract habit ID and action
+    if (response.payload != null && response.payload!.startsWith('habit_')) {
+      final parts = response.payload!.split(':action:');
+      if (parts.length == 2) {
+        final habitId = int.tryParse(parts[0].replaceFirst('habit_', ''));
+        final action = parts[1];
+
+        print('DEBUG: Extracted habitId: $habitId, action: $action');
+
+        if (habitId != null) {
+          await _handleNotificationAction(habitId!, action);
+        }
+      }
+    }
+
     // Could navigate to specific habit or open the app
     // TODO: Implement navigation logic if needed
+  }
+
+  static Future<void> _handleNotificationAction(int habitId, String action) async {
+    print('DEBUG: Handling notification action: $action for habit: $habitId');
+
+    try {
+      if (action == 'mark_complete') {
+        print('DEBUG: Marking habit as complete from notification');
+        // This will be handled by the habit controller through a global callback
+        _onHabitActionCallback?.call(habitId, 'complete');
+      } else if (action == 'skip') {
+        print('DEBUG: Skipping habit from notification (no action needed)');
+        // Just dismiss the notification - don't do anything else
+        _onHabitActionCallback?.call(habitId, 'skip');
+      }
+    } catch (e) {
+      print('DEBUG: Error handling notification action: $e');
+    }
+  }
+
+  // Global callback to handle habit actions from notifications
+  static Function(int habitId, String action)? _onHabitActionCallback;
+
+  // External method to complete a habit from notification
+  static Future<void> completeHabitFromNotification(int habitId) async {
+    print('DEBUG: External call to complete habit $habitId from notification');
+    _onHabitActionCallback?.call(habitId, 'complete');
+  }
+
+  // Method to be called from HabitController to handle notification actions
+  static void setHabitActionCallback(Function(int habitId, String action) callback) {
+    print('DEBUG: Setting habit action callback');
+    _onHabitActionCallback = callback;
   }
 
   static Future<void> scheduleHabitReminder({
@@ -134,7 +189,7 @@ class NotificationService {
         'Time for your habit! 🎯',
         _getNextOccurrence(dayOfWeek, hour, minute),
         _buildNotificationDetails(),
-        payload: 'habit_$habitId',
+        payload: 'habit_$habitId:action_complete,habit_$habitId:action_skip',
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -156,6 +211,18 @@ class NotificationService {
         category: AndroidNotificationCategory.reminder,
         fullScreenIntent: true,
         visibility: NotificationVisibility.public,
+        actions: [
+          const AndroidNotificationAction(
+            'mark_complete',
+            'Mark Complete',
+            showsUserInterface: true,
+          ),
+          const AndroidNotificationAction(
+            'skip',
+            'Skip',
+            showsUserInterface: true,
+          ),
+        ],
       ),
     );
   }

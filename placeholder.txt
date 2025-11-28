@@ -1,0 +1,5 @@
+NOTIFICATION ICONS NEEDED
+
+Create these PNG files in android/app/src/main/res/mipmap-* directory:
+- ic_menu_save.png (green checkmark)
+- ic_media_next.png (red cancel/skip)

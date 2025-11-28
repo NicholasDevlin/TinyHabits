@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/repositories/habit_repository_impl.dart';
 import '../../domain/models/habit.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/simple_widget_service.dart';
 
 part 'habit_providers.g.dart';
 
@@ -45,7 +46,25 @@ final Set<int> _ongoingDeletions = <int>{};
 class HabitController extends _$HabitController {
   @override
   FutureOr<void> build() {
+    // Initialize notification service with callback for handling notification actions
+    NotificationService.setHabitActionCallback(_handleNotificationAction);
     // No initial state needed
+  }
+
+  // Handle habit completion from notifications
+  Future<void> _handleNotificationAction(int habitId, String action) async {
+    print('DEBUG: HabitController received notification action: $action for habit: $habitId');
+
+    if (action == 'complete') {
+      print('DEBUG: Marking habit $habitId as complete from notification');
+      await markHabitCompleted(habitId, true);
+    }
+  }
+
+  // Public method to complete habit from external source (like notifications)
+  Future<void> completeHabitExternally(int habitId, bool isCompleted) async {
+    print('DEBUG: External call to complete habit $habitId with status: $isCompleted');
+    await markHabitCompleted(habitId, isCompleted);
   }
 
   Future<void> createHabit(CreateHabitRequest request) async {
@@ -62,6 +81,10 @@ class HabitController extends _$HabitController {
         targetDays: request.targetDays,
       );
 
+      // Update widget after creating new habit
+      final widgetService = ref.read(simpleWidgetServiceProvider);
+      await widgetService.onHabitCreated();
+
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
       ref.invalidate(allHabitsProvider);
@@ -77,6 +100,10 @@ class HabitController extends _$HabitController {
       final repository = ref.read(habitRepositoryProvider);
       final today = DateTime.now();
       await repository.markHabitCompleted(habitId, today, isCompleted);
+
+      // Update widget after habit completion changes
+      final widgetService = ref.read(simpleWidgetServiceProvider);
+      await widgetService.onHabitCompletionChanged();
 
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
@@ -120,6 +147,10 @@ class HabitController extends _$HabitController {
         targetDays: request.targetDays,
       );
 
+      // Update widget after habit modification
+      final widgetService = ref.read(simpleWidgetServiceProvider);
+      await widgetService.onHabitChanged();
+
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
       ref.invalidate(allHabitsProvider);
@@ -147,6 +178,10 @@ class HabitController extends _$HabitController {
       await NotificationService.cancelHabitReminders(habitId);
 
       await repository.deleteHabit(habitId);
+
+      // Update widget after habit deletion
+      final widgetService = ref.read(simpleWidgetServiceProvider);
+      await widgetService.onHabitDeleted();
 
       // Invalidate providers to refresh the UI
       ref.invalidate(todayHabitsProvider);
