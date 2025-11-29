@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/models/habit_widget.dart';
-import '../../domain/models/habit.dart';
 import '../../domain/repositories/habit_widget_repository.dart';
 
 class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
@@ -92,7 +91,8 @@ class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
       }
     }
 
-    return todayHabits;
+    // Sort habits: reminder time ascending, completed habits at bottom
+    return _sortWidgetHabits(todayHabits);
   }
 
   @override
@@ -124,6 +124,32 @@ class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
       totalHabits: habits.length,
       completedHabits: completedCount,
     );
+  }
+
+  List<WidgetHabit> _sortWidgetHabits(List<WidgetHabit> habits) {
+    return habits.toList()..sort((a, b) {
+      // First, compare completion status - completed habits go to bottom
+      if (a.isCompletedToday != b.isCompletedToday) {
+        return a.isCompletedToday ? 1 : -1;
+      }
+
+      // If both have the same completion status, sort by reminder time
+      final timeA = _parseWidgetTime(a.reminderTime);
+      final timeB = _parseWidgetTime(b.reminderTime);
+      return timeA.compareTo(timeB);
+    });
+  }
+
+  DateTime _parseWidgetTime(String? timeString) {
+    if (timeString == null || timeString.isEmpty) {
+      // If no reminder time is set, treat it as very late in the day
+      return DateTime(2023, 1, 1, 23, 59);
+    }
+
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+    return DateTime(2023, 1, 1, hour, minute); // Use dummy date for time comparison
   }
 }
 

@@ -107,8 +107,9 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
   Widget _buildHabitsList(BuildContext context, WidgetRef ref, List<Habit> habits, {required bool isTodayTab}) {
     final visibleHabits = habits.where((habit) => !_dismissedHabitIds.contains(habit.id)).toList();
+    final sortedHabits = _sortHabitsByReminderTime(visibleHabits);
 
-    if (visibleHabits.isEmpty) {
+    if (sortedHabits.isEmpty) {
       return _buildEmptyState(context, isTodayTab);
     }
 
@@ -130,7 +131,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
           if (isTodayTab) ...[
             Text(
-              _getMotivationalText(visibleHabits),
+              _getMotivationalText(sortedHabits),
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 color: AppTheme.secondaryColor.withOpacity(0.7),
@@ -143,9 +144,9 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
           Expanded(
             child: ListView.builder(
-              itemCount: visibleHabits.length,
+              itemCount: sortedHabits.length,
               itemBuilder: (context, index) {
-                final habit = visibleHabits[index];
+                final habit = sortedHabits[index];
                 final isAvailableToday = _isHabitAvailableToday(habit);
 
                 return Padding(
@@ -458,4 +459,25 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
     return habit.targetDays.contains(todayWeekday);
   }
 
+  List<Habit> _sortHabitsByReminderTime(List<Habit> habits) {
+    return habits.toList()..sort((a, b) {
+      // First, compare completion status - completed habits go to bottom
+      if (a.isCompletedToday != b.isCompletedToday) {
+        return a.isCompletedToday ? 1 : -1;
+      }
+
+      // If both have the same completion status, sort by reminder time
+      final timeA = _parseTime(a.reminderTime);
+      final timeB = _parseTime(b.reminderTime);
+      return timeA.compareTo(timeB);
+    });
   }
+
+  DateTime _parseTime(String timeString) {
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+    return DateTime(2023, 1, 1, hour, minute); // Use dummy date for time comparison
+  }
+
+}
