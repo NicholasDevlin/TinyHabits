@@ -114,7 +114,7 @@ public class HabitWidgetProvider extends AppWidgetProvider {
                     views.removeAllViews(R.id.habits_container);
 
                     // Add habit items to the container
-                    int maxHabitsToShow = Math.min(habitsArray.length(), 5); // Show max 5 habits
+                    int maxHabitsToShow = Math.min(habitsArray.length(), 10); // Show max 10 habits
 
                     for (int i = 0; i < maxHabitsToShow; i++) {
                         try {
