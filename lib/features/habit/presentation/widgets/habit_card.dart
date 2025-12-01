@@ -82,10 +82,6 @@ class _HabitCardState extends State<HabitCard>
                           color: _isCompleted
                               ? AppTheme.secondaryColor.withOpacity(0.7)
                               : AppTheme.secondaryColor,
-                        ).copyWith(
-                          decoration: _isCompleted
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
                         ),
                       ),
                       if (widget.habit.description != null) ...[
@@ -95,10 +91,6 @@ class _HabitCardState extends State<HabitCard>
                           style: AppTheme.appTextStyle(
                             fontSize: 14,
                             color: AppTheme.secondaryColor.withOpacity(0.6),
-                          ).copyWith(
-                            decoration: _isCompleted
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
