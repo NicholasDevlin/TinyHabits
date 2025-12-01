@@ -1,10 +1,11 @@
 import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/habit_entries_table.dart';
+import '../tables/habits_table.dart';
 
 part 'habit_entries_dao.g.dart';
 
-@DriftAccessor(tables: [HabitEntriesTable])
+@DriftAccessor(tables: [HabitEntriesTable, HabitsTable])
 class HabitEntriesDao extends DatabaseAccessor<AppDatabase> with _$HabitEntriesDaoMixin {
   HabitEntriesDao(super.db);
 
@@ -58,26 +59,67 @@ class HabitEntriesDao extends DatabaseAccessor<AppDatabase> with _$HabitEntriesD
 
   // Calculate current streak for a habit
   Future<int> calculateStreak(int habitId) async {
-    final entries = await (select(habitEntriesTable)
-          ..where((e) => e.habitId.equals(habitId) & e.isCompleted.equals(true))
-          ..orderBy([(e) => OrderingTerm.desc(e.date)]))
+    final habit = await (select(habitsTable)..where((h) => h.id.equals(habitId)))
+        .getSingleOrNull();
+
+    if (habit == null) return 0;
+
+    final targetDays = habit.targetDays
+        .split(',')
+        .map((day) => int.tryParse(day.trim()))
+        .whereType<int>()
+        .toSet();
+
+    final now = DateTime.now();
+    final yearAgo = now.subtract(const Duration(days: 365));
+
+    final habitEntries = await (select(habitEntriesTable)
+      ..where((e) =>
+      e.habitId.equals(habitId) &
+      e.isCompleted.equals(true) &
+      e.date.isBiggerThan(Variable(yearAgo)))
+      ..orderBy([(e) => OrderingTerm.desc(e.date)]))
         .get();
 
-    if (entries.isEmpty) return 0;
+    if (habitEntries.isEmpty) return 0;
 
     int streak = 0;
-    DateTime streakDate = DateTime.now();
-    streakDate = DateTime(streakDate.year, streakDate.month, streakDate.day);
+    DateTime checkDate = DateTime(now.year, now.month, now.day);
+    int entryIndex = 0;
 
-    for (final entry in entries) {
-      final entryDate = DateTime(entry.date.year, entry.date.month, entry.date.day);
+    while (now.difference(checkDate).inDays <= 365) {
+      // If we have run out of habitEntries to check, and we hit a target day, the streak is over.
+      // (Unless we haven't hit a target day yet, then we keep going back)
 
-      if (entryDate == streakDate) {
-        streak++;
-        streakDate = streakDate.subtract(const Duration(days: 1));
-      } else {
-        break;
+      if (targetDays.contains(checkDate.weekday)) {
+        bool foundMatch = false;
+
+        while (entryIndex < habitEntries.length) {
+          final entryDate = habitEntries[entryIndex].date;
+          final habitEntryDate = DateTime(entryDate.year, entryDate.month, entryDate.day);
+
+          if (habitEntryDate.isAtSameMomentAs(checkDate)) {
+            foundMatch = true;
+            entryIndex++;
+
+            break;
+          } else if (habitEntryDate.isBefore(checkDate)) {
+            break;
+          } else {
+            // The entry is NEWER than check date (shouldn't happen often due to logic, but strictly skips ahead)
+            entryIndex++;
+          }
+        }
+
+        if (foundMatch) {
+          streak++;
+        } else {
+          // Scheduled day, but no entry found -> Streak broken
+          break;
+        }
       }
+
+      checkDate = checkDate.subtract(const Duration(days: 1));
     }
 
     return streak;
