@@ -79,6 +79,7 @@ class HabitController extends _$HabitController {
         habitTitle: request.title,
         reminderTime: request.reminderTime,
         targetDays: request.targetDays,
+        isCompletedToday: false, // New habits are not completed today
       );
 
       // Update widget after creating new habit
@@ -99,7 +100,22 @@ class HabitController extends _$HabitController {
     try {
       final repository = ref.read(habitRepositoryProvider);
       final today = DateTime.now();
+
+      // Get habit details before marking complete for notification rescheduling
+      final habit = await repository.getHabitById(habitId);
+
       await repository.markHabitCompleted(habitId, today, isCompleted);
+
+      // If habit is being marked complete, cancel today's notification and reschedule
+      if (isCompleted && habit != null) {
+        print('DEBUG: Cancelling today notification and rescheduling for habit $habitId');
+        await NotificationService.cancelTodayAndRescheduleNext(
+          habitId: habitId,
+          habitTitle: habit.title,
+          reminderTime: habit.reminderTime,
+          targetDays: habit.targetDays,
+        );
+      }
 
       // Update widget after habit completion changes
       final widgetService = ref.read(simpleWidgetServiceProvider);
@@ -145,6 +161,7 @@ class HabitController extends _$HabitController {
         habitTitle: request.title,
         reminderTime: request.reminderTime,
         targetDays: request.targetDays,
+        isCompletedToday: existingHabit.isCompletedToday,
       );
 
       // Update widget after habit modification

@@ -86,17 +86,12 @@ class NotificationService {
   }
 
   static Future<void> _onNotificationTapped(NotificationResponse response) async {
-    print('DEBUG: Notification tapped: ${response.payload}');
-    print('DEBUG: Action ID: ${response.actionId}');
-
     // Parse the payload to extract habit ID and action
     if (response.payload != null && response.payload!.startsWith('habit_')) {
       final parts = response.payload!.split(':action:');
       if (parts.length == 2) {
         final habitId = int.tryParse(parts[0].replaceFirst('habit_', ''));
         final action = parts[1];
-
-        print('DEBUG: Extracted habitId: $habitId, action: $action');
 
         if (habitId != null) {
           await _handleNotificationAction(habitId!, action);
@@ -109,20 +104,16 @@ class NotificationService {
   }
 
   static Future<void> _handleNotificationAction(int habitId, String action) async {
-    print('DEBUG: Handling notification action: $action for habit: $habitId');
-
     try {
       if (action == 'mark_complete') {
-        print('DEBUG: Marking habit as complete from notification');
         // This will be handled by the habit controller through a global callback
         _onHabitActionCallback?.call(habitId, 'complete');
       } else if (action == 'skip') {
-        print('DEBUG: Skipping habit from notification (no action needed)');
         // Just dismiss the notification - don't do anything else
         _onHabitActionCallback?.call(habitId, 'skip');
       }
     } catch (e) {
-      print('DEBUG: Error handling notification action: $e');
+      print('Error handling notification action: $e');
     }
   }
 
@@ -131,13 +122,11 @@ class NotificationService {
 
   // External method to complete a habit from notification
   static Future<void> completeHabitFromNotification(int habitId) async {
-    print('DEBUG: External call to complete habit $habitId from notification');
     _onHabitActionCallback?.call(habitId, 'complete');
   }
 
   // Method to be called from HabitController to handle notification actions
   static void setHabitActionCallback(Function(int habitId, String action) callback) {
-    print('DEBUG: Setting habit action callback');
     _onHabitActionCallback = callback;
   }
 
@@ -146,6 +135,7 @@ class NotificationService {
     required String habitTitle,
     required String reminderTime,
     required List<int> targetDays,
+    bool? isCompletedToday,
   }) async {
     try {
       if (!_isInitialized) await initialize();
@@ -158,6 +148,7 @@ class NotificationService {
         targetDays: targetDays,
         hour: timeParts.hour,
         minute: timeParts.minute,
+        isCompletedToday: isCompletedToday,
       );
     } catch (e) {
       rethrow;
@@ -179,9 +170,23 @@ class NotificationService {
     required List<int> targetDays,
     required int hour,
     required int minute,
+    bool? isCompletedToday,
   }) async {
+    final now = DateTime.now();
+
     for (final dayOfWeek in targetDays) {
       final notificationId = _generateNotificationId(habitId, dayOfWeek);
+
+      // Skip today if habit is already completed or time has passed
+      if (dayOfWeek == now.weekday) {
+        final scheduledTime = DateTime(now.year, now.month, now.day, hour, minute);
+        final isTimePassed = scheduledTime.isBefore(now);
+
+        // If habit is completed today or time has passed, schedule for next week instead
+        if (isCompletedToday == true || isTimePassed) {
+          continue; // Skip scheduling for today
+        }
+      }
 
       await _notifications.zonedSchedule(
         notificationId,
@@ -239,6 +244,7 @@ class NotificationService {
     required String habitTitle,
     required String reminderTime,
     required List<int> targetDays,
+    bool? isCompletedToday,
   }) async {
     await cancelHabitReminders(habitId);
     await scheduleHabitReminder(
@@ -246,11 +252,97 @@ class NotificationService {
       habitTitle: habitTitle,
       reminderTime: reminderTime,
       targetDays: targetDays,
+      isCompletedToday: isCompletedToday,
     );
     try {
     } catch (e) {
       rethrow; // Let the caller handle this since rescheduling is critical
     }
+  }
+
+  /// Cancel today's notification for a specific habit and reschedule for next target day
+  static Future<void> cancelTodayAndRescheduleNext({
+    required int habitId,
+    required String habitTitle,
+    required String reminderTime,
+    required List<int> targetDays,
+  }) async {
+    try {
+      if (!_isInitialized) await initialize();
+
+      // Cancel today's notification only
+      await _cancelTodayNotification(habitId);
+
+      // Reschedule for next target day
+      await _scheduleNextTargetDay(
+        habitId: habitId,
+        habitTitle: habitTitle,
+        reminderTime: reminderTime,
+        targetDays: targetDays,
+      );
+    } catch (e) {
+      print('Error in cancelTodayAndRescheduleNext: $e');
+      rethrow;
+    }
+  }
+
+  /// Cancel today's notification for a specific habit
+  static Future<void> _cancelTodayNotification(int habitId) async {
+    final now = DateTime.now();
+    final todayWeekday = now.weekday; // 1=Monday, 7=Sunday
+    final todayNotificationId = _generateNotificationId(habitId, todayWeekday);
+
+    await _notifications.cancel(todayNotificationId);
+  }
+
+  /// Schedule the next target day notification (excluding today)
+  static Future<void> _scheduleNextTargetDay({
+    required int habitId,
+    required String habitTitle,
+    required String reminderTime,
+    required List<int> targetDays,
+  }) async {
+    final timeParts = _parseReminderTime(reminderTime);
+
+    // Find the next target day (excluding today)
+    final nextTargetDay = _findNextTargetDay(targetDays);
+
+    if (nextTargetDay != null) {
+      final notificationId = _generateNotificationId(habitId, nextTargetDay);
+
+      await _notifications.zonedSchedule(
+        notificationId,
+        habitTitle,
+        'Time for your habit! 🎯',
+        _getNextOccurrence(nextTargetDay, timeParts.hour, timeParts.minute),
+        _buildNotificationDetails(),
+        payload: 'habit_$habitId:action_complete,habit_$habitId:action_skip',
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } else {
+      print('No more target days found for habit $habitId in this week');
+    }
+  }
+
+  /// Find the next target day from today's date (excluding today)
+  static int? _findNextTargetDay(List<int> targetDays) {
+    final now = DateTime.now();
+    int currentWeekday = now.weekday; // 1=Monday, 7=Sunday
+
+    // Sort target days to ensure proper order
+    final sortedTargetDays = List<int>.from(targetDays)..sort();
+
+    // Search for the next target day in the current week
+    for (int i = 0; i < 7; i++) {
+      currentWeekday = currentWeekday % 7 + 1; // Move to next day (1-7)
+
+      if (sortedTargetDays.contains(currentWeekday)) {
+        return currentWeekday;
+      }
+    }
+
+    return null; // No target days found
   }
 
   static int _generateNotificationId(int habitId, int dayOfWeek) {
