@@ -3,37 +3,18 @@ package com.example.tiny_wins;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.CheckBox;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.plugin.common.MethodChannel;
-// import androidx.work.WorkManager;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class HabitWidgetProvider extends AppWidgetProvider {
-
-    private static final String PREFS_NAME = "HabitWidgetPrefs";
-    private static final String WIDGET_DATA_KEY = "widget_data";
-    private static final String ACTION_TOGGLE_HABIT = "com.example.tiny_wins.TOGGLE_HABIT";
     private static final String ACTION_MARK_COMPLETE = "com.example.tiny_wins.MARK_COMPLETE";
-    private static final String ACTION_OPEN_APP = "com.example.tiny_wins.OPEN_APP";
     private static final String EXTRA_HABIT_ID = "habit_id";
     private static final String EXTRA_WIDGET_ID = "widget_id";
 
@@ -48,16 +29,7 @@ public class HabitWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-        if (ACTION_TOGGLE_HABIT.equals(intent.getAction())) {
-            int habitId = intent.getIntExtra(EXTRA_HABIT_ID, -1);
-            int widgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1);
-
-            if (habitId != -1 && widgetId != -1) {
-                // Toggle habit completion and update widget
-                toggleHabitCompletion(context, habitId);
-                updateAppWidget(context, AppWidgetManager.getInstance(context), widgetId);
-            }
-        } else if (ACTION_MARK_COMPLETE.equals(intent.getAction())) {
+        if (ACTION_MARK_COMPLETE.equals(intent.getAction())) {
             int habitId = intent.getIntExtra(EXTRA_HABIT_ID, -1);
             int widgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1);
 
@@ -66,10 +38,6 @@ public class HabitWidgetProvider extends AppWidgetProvider {
                 markHabitComplete(context, habitId);
                 updateAppWidget(context, AppWidgetManager.getInstance(context), widgetId);
             }
-        } else if (ACTION_OPEN_APP.equals(intent.getAction())) {
-            Intent openAppIntent = new Intent(context, MainActivity.class);
-            openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(openAppIntent);
         }
     }
 
@@ -131,19 +99,17 @@ public class HabitWidgetProvider extends AppWidgetProvider {
                     views.setViewVisibility(R.id.habits_message, View.VISIBLE);
                     views.setTextViewText(R.id.habits_message, "No habits scheduled for today");
                 }
-
             } else {
                 // No data available
                 views.setTextViewText(R.id.widget_title, "TinyWins");
                 views.setTextViewText(R.id.widget_subtitle, "Today's Habits");
-                views.setTextViewText(R.id.habits_message, "Open the app to create your first habit!");
+                views.setTextViewText(R.id.habits_message, "Create your first habit!");
             }
-
         } catch (JSONException e) {
             // Error parsing data, show default message
             views.setTextViewText(R.id.widget_title, "TinyWins");
             views.setTextViewText(R.id.widget_subtitle, "Today's Habits");
-            views.setTextViewText(R.id.habits_message, "Open the app to create your first habit!");
+            views.setTextViewText(R.id.habits_message, "Create your first habit!");
         }
 
         // Update the widget
@@ -179,20 +145,6 @@ public class HabitWidgetProvider extends AppWidgetProvider {
         return habitItem;
     }
 
-    private void toggleHabitCompletion(Context context, int habitId) {
-        // Start MainActivity with habit action data
-        Intent mainIntent = new Intent(context, MainActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mainIntent.putExtra("widget_habit_id", habitId);
-        mainIntent.putExtra("widget_action", "toggle_habit");
-        context.startActivity(mainIntent);
-
-        // Also trigger widget update
-        Intent updateIntent = new Intent(context, HabitWidgetProvider.class);
-        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        context.sendBroadcast(updateIntent);
-    }
-
     private void markHabitComplete(Context context, int habitId) {
         // Start MainActivity with habit action data
         Intent mainIntent = new Intent(context, MainActivity.class);
@@ -210,6 +162,9 @@ public class HabitWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         // Called when the first widget is created
+        // Schedule daily refresh to ensure widget updates at midnight
+        WidgetRefreshScheduler.scheduleDailyRefresh(context);
+        android.util.Log.d("HabitWidgetProvider", "Widget enabled - daily refresh scheduled");
     }
 
     @Override

@@ -129,17 +129,10 @@ class SimpleWidgetService {
     await updateWidgetData();
   }
 
-  Future<void> onHabitCreated() async {
-    await updateWidgetData();
-  }
-
-  Future<void> onHabitDeleted() async {
-    await updateWidgetData();
-  }
-
-  Future<void> onHabitCompletionChanged() async {
-    await updateWidgetData();
-  }
+  // Consolidated habit change methods
+  Future<void> onHabitCreated() async => onHabitChanged();
+  Future<void> onHabitDeleted() async => onHabitChanged();
+  Future<void> onHabitCompletionChanged() async => onHabitChanged();
 
   void dispose() {
     // Cleanup if needed

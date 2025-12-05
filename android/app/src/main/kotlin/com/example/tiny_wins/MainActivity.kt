@@ -19,7 +19,7 @@ class MainActivity: FlutterActivity() {
                     val action = intent.getStringExtra("widget_action")
                     if (habitId != -1 && action != null) {
                         result.success(mapOf("habitId" to habitId, "action" to action))
-                        // Clear the intent to avoid重复处理
+                        // Clear the intent to avoid repeat processing
                         intent.removeExtra("widget_habit_id")
                         intent.removeExtra("widget_action")
                     } else {

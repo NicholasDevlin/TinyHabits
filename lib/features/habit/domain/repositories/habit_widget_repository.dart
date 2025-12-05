@@ -12,5 +12,4 @@ abstract class HabitWidgetRepository {
 
   // Widget maintenance
   Future<void> refreshWidget();
-  Future<void> clearWidgetData();
 }

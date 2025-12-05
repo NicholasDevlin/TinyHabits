@@ -60,5 +60,20 @@
                 android:resource="@xml/habit_widget_info" />
         </receiver>
 
+        <!-- Daily Widget Refresh Receiver -->
+        <receiver android:name="com.example.tiny_wins.WidgetRefreshScheduler$DailyRefreshReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.tiny_wins.DAILY_WIDGET_REFRESH" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot Receiver to reschedule alarms after reboot -->
+        <receiver android:name="com.example.tiny_wins.WidgetRefreshScheduler$BootReceiver" android:exported="false">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

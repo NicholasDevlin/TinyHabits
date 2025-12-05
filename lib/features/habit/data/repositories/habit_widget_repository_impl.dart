@@ -104,16 +104,7 @@ class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
     }
   }
 
-  @override
-  Future<void> clearWidgetData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_widgetDataKey);
-    } catch (e) {
-      print('Error clearing widget data: $e');
-    }
-  }
-
+  
   Future<WidgetData> _getFreshWidgetData() async {
     final habits = await getTodayHabitsForWidget();
     final completedCount = habits.where((h) => h.isCompletedToday).length;
