@@ -5,6 +5,8 @@ A beautiful, offline-first habit tracking app built with Flutter following clean
 ## Features
 
 - ✅ **Offline-first**: All data stored locally using Drift (SQLite)
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/1feacfc6-33c7-48d8-bf0c-6dab46ca4607" />
+
 - 🎯 **Daily habit tracking**: Mark habits as complete with satisfying animations
 <img width="200" alt="image" src="https://github.com/user-attachments/assets/c4500e25-b793-4083-acdb-7040b241921e" />
 
