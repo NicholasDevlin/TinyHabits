@@ -80,52 +80,66 @@ class _HabitCardState extends State<HabitCard>
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: _isCompleted
-                              ? AppTheme.secondaryColor.withOpacity(0.7)
-                              : AppTheme.secondaryColor,
+                              ? Colors.black.withOpacity(0.7)
+                              : Colors.black,
                         ),
                       ),
+
                       if (widget.habit.description != null) ...[
                         const SizedBox(height: 4),
+
                         Text(
                           widget.habit.description!,
                           style: AppTheme.appTextStyle(
                             fontSize: 14,
-                            color: AppTheme.secondaryColor.withOpacity(0.6),
+                            color: Colors.black.withOpacity(0.6),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
+
                       const SizedBox(height: 8),
+
                       Row(
                         children: [
                           Icon(
                             Icons.schedule,
                             size: 16,
-                            color: AppTheme.secondaryColor.withOpacity(0.5),
+                            color: Colors.black.withOpacity(0.5),
                           ),
+
                           const SizedBox(width: 4),
+
                           Text(
                             widget.habit.reminderTime,
                             style: AppTheme.appTextStyle(
                               fontSize: 12,
-                              color: AppTheme.secondaryColor.withOpacity(0.5),
+                              color: Colors.black.withOpacity(0.5),
                             ),
                           ),
+
                           const SizedBox(width: 16),
+
                           if (widget.habit.currentStreak > 0) ...[
-                            Icon(
-                              Icons.local_fire_department,
-                              size: 16,
-                              color: Colors.orange,
-                            ),
                             const SizedBox(width: 4),
+
                             Text(
-                              '${widget.habit.currentStreak} day streak',
+                              '🔥 ${widget.habit.currentStreak} day streak',
                               style: AppTheme.appTextStyle(
                                 fontSize: 12,
-                                color: Colors.orange,
-                                fontWeight: FontWeight.w500,
+                                color: AppTheme.primaryColor,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ] else if (! isButtonEnabled) ...[
+                            const SizedBox(width: 4),
+
+                            Text(
+                              "This habit isn't available for today",
+                              style: AppTheme.appTextStyle(
+                                fontSize: 12,
+                                color: AppTheme.primaryColor,
                               ),
                             ),
                           ],
@@ -149,14 +163,25 @@ class _HabitCardState extends State<HabitCard>
                       height: 56,
                       decoration: BoxDecoration(
                         color: _isCompleted
-                            ? AppTheme.successColor
+                            ? null
                             : isButtonEnabled
                                 ? AppTheme.primaryColor.withOpacity(0.1)
                                 : AppTheme.secondaryColor.withOpacity(0.1),
+                        gradient: _isCompleted
+                            ? const LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [
+                                AppTheme.tertiaryColor,
+                                AppTheme.primaryColor,
+                                AppTheme.secondaryColor,
+                              ],
+                            )
+                            : null,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: _isCompleted
-                              ? AppTheme.successColor
+                              ? AppTheme.primaryColor
                               : isButtonEnabled
                                   ? AppTheme.primaryColor
                                   : AppTheme.secondaryColor.withOpacity(0.3),

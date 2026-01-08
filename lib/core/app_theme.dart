@@ -14,14 +14,15 @@ class AppTheme {
     );
   }
   // Color Palette as specified in the instructions
-  static const Color primaryColor = Color(0xFF85D8EA); // Light Cyan/Blue
-  static const Color secondaryColor = Color(0xFF546A7B); // Blue Grey
+  static const Color primaryColor = Color(0xFFD67E17);
+  static const Color secondaryColor = Color(0xFFCA3F1B);
   static const Color backgroundColor = Colors.white;
   static const Color lightBackgroundColor = Color(0xFFFAFAFA);
   static const Color successColor = Colors.green;
   static const Color warningColor = Colors.orangeAccent;
   static const Color errorColor = Colors.red;
   static const Color surfaceColor = Colors.white;
+  static const Color tertiaryColor = Color(0xFFEDBD21);
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -30,8 +31,15 @@ class AppTheme {
         seedColor: primaryColor,
         primary: primaryColor,
         secondary: secondaryColor,
+        tertiary: tertiaryColor,
         surface: surfaceColor,
         error: errorColor,
+      ).copyWith(
+        onSurface: Colors.black,
+        onBackground: Colors.black,
+        onPrimary: Colors.black,
+        onSecondary: Colors.black,
+        onTertiary: Colors.black,
       ),
       scaffoldBackgroundColor: lightBackgroundColor,
       textTheme: const TextTheme(
@@ -58,9 +66,9 @@ class AppTheme {
           fontFamily: 'Roboto',
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: secondaryColor,
+          color: Colors.black,
         ),
-        iconTheme: const IconThemeData(color: secondaryColor),
+        iconTheme: const IconThemeData(),
       ),
       cardTheme: const CardThemeData(
         elevation: 2,
@@ -72,7 +80,6 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

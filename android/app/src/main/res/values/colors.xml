@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="checkbox_tint">#85D8EA</color>
+    <color name="checkbox_tint">#BC6F0F</color>
     <color name="checkbox_checked">#4CAF50</color>
     <color name="checkbox_unchecked">#9E9E9E</color>
     <color name="widget_background">#FFFFFF</color>
-    <color name="widget_header">#85D8EA</color>
+    <color name="widget_header">#BC6F0F</color>
     <color name="widget_text_primary">#000000</color>
     <color name="widget_text_secondary">#333333</color>
 </resources>

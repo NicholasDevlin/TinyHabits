@@ -27,7 +27,6 @@ class HabitDetailPage extends ConsumerWidget {
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
           loading: () => Text(
@@ -35,7 +34,6 @@ class HabitDetailPage extends ConsumerWidget {
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
           error: (_, __) => Text(
@@ -43,13 +41,15 @@ class HabitDetailPage extends ConsumerWidget {
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(
+              Icons.delete_outline,
+              color: Colors.red,
+            ),
             onPressed: () => _showDeleteConfirmation(context, ref),
           ),
         ],
@@ -95,7 +95,6 @@ class HabitDetailPage extends ConsumerWidget {
                         style: AppTheme.appTextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.secondaryColor,
                         ),
                       ),
 
@@ -106,7 +105,7 @@ class HabitDetailPage extends ConsumerWidget {
                           habit.description!,
                           style: AppTheme.appTextStyle(
                             fontSize: 16,
-                            color: AppTheme.secondaryColor.withOpacity(0.7),
+                            color: Colors.black.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -115,10 +114,9 @@ class HabitDetailPage extends ConsumerWidget {
 
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.schedule,
                             size: 20,
-                            color: AppTheme.primaryColor,
                           ),
 
                           const SizedBox(width: 8),
@@ -127,7 +125,7 @@ class HabitDetailPage extends ConsumerWidget {
                             'Reminder at ${habit.reminderTime}',
                             style: AppTheme.appTextStyle(
                               fontSize: 14,
-                              color: AppTheme.secondaryColor.withOpacity(0.7),
+                              color: Colors.black.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -137,10 +135,9 @@ class HabitDetailPage extends ConsumerWidget {
 
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.repeat,
                             size: 20,
-                            color: AppTheme.primaryColor,
                           ),
 
                           const SizedBox(width: 8),
@@ -149,7 +146,7 @@ class HabitDetailPage extends ConsumerWidget {
                             _formatTargetDays(habit.targetDays),
                             style: AppTheme.appTextStyle(
                               fontSize: 14,
-                              color: AppTheme.secondaryColor.withOpacity(0.7),
+                              color: Colors.black.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -168,7 +165,6 @@ class HabitDetailPage extends ConsumerWidget {
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
 
@@ -181,8 +177,8 @@ class HabitDetailPage extends ConsumerWidget {
                   'Current Streak',
                   '${habit.currentStreak}',
                   'days',
-                  Icons.local_fire_department,
-                  Colors.orange,
+                  '🔥',
+                  null,
                 ),
               ),
 
@@ -207,7 +203,6 @@ class HabitDetailPage extends ConsumerWidget {
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
 
@@ -229,8 +224,8 @@ class HabitDetailPage extends ConsumerWidget {
     String title,
     String value,
     String unit,
-    IconData icon,
-    Color color,
+    dynamic icon,
+    Color? color,
   ) {
     return Card(
       child: Padding(
@@ -240,7 +235,10 @@ class HabitDetailPage extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: color, size: 20),
+                icon is IconData
+                    ? Icon(icon, color: color, size: 24)
+                    : Text(icon, style: const TextStyle(fontSize: 20),
+                ),
 
                 const SizedBox(width: 8),
 
@@ -250,7 +248,7 @@ class HabitDetailPage extends ConsumerWidget {
                     style: AppTheme.appTextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.secondaryColor.withOpacity(0.7),
+                      color: Colors.black.withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -264,7 +262,6 @@ class HabitDetailPage extends ConsumerWidget {
               style: AppTheme.appTextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -272,7 +269,7 @@ class HabitDetailPage extends ConsumerWidget {
               unit,
               style: AppTheme.appTextStyle(
                 fontSize: 12,
-                color: AppTheme.secondaryColor.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.5),
               ),
             ),
           ],
@@ -298,7 +295,7 @@ class HabitDetailPage extends ConsumerWidget {
           startingDayOfWeek: StartingDayOfWeek.monday,
           calendarStyle: CalendarStyle(
             // Completed days
-            markerDecoration: BoxDecoration(
+            markerDecoration: const BoxDecoration(
               color: AppTheme.primaryColor,
               shape: BoxShape.circle,
             ),
@@ -313,9 +310,6 @@ class HabitDetailPage extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
             // Default day style
-            defaultTextStyle: AppTheme.appTextStyle(
-              color: AppTheme.secondaryColor,
-            ),
             weekendTextStyle: AppTheme.appTextStyle(
               color: AppTheme.secondaryColor.withOpacity(0.7),
             ),
@@ -328,19 +322,16 @@ class HabitDetailPage extends ConsumerWidget {
               fontWeight: FontWeight.w600,
               color: AppTheme.secondaryColor,
             ),
-            leftChevronIcon: Icon(
+            leftChevronIcon: const Icon(
               Icons.chevron_left,
-              color: AppTheme.primaryColor,
             ),
-            rightChevronIcon: Icon(
+            rightChevronIcon: const Icon(
               Icons.chevron_right,
-              color: AppTheme.primaryColor,
             ),
           ),
           daysOfWeekStyle: DaysOfWeekStyle(
             weekdayStyle: AppTheme.appTextStyle(
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
             weekendStyle: AppTheme.appTextStyle(
               fontWeight: FontWeight.w600,
@@ -360,7 +351,7 @@ class HabitDetailPage extends ConsumerWidget {
                   child: Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppTheme.primaryColor,
                       shape: BoxShape.circle,
                     ),
@@ -441,9 +432,9 @@ class HabitDetailPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(
+            child: const Text(
               'Cancel',
-              style: AppTheme.appTextStyle(color: AppTheme.secondaryColor),
+              style: TextStyle(color: Colors.black),
             ),
           ),
 
@@ -474,9 +465,9 @@ class HabitDetailPage extends ConsumerWidget {
                 }
               }
             },
-            child: Text(
+            child: const Text(
               'Delete',
-              style: AppTheme.appTextStyle(color: AppTheme.errorColor),
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],

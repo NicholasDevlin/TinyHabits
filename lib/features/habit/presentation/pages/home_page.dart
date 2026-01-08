@@ -36,11 +36,10 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'TinyWins',
+          'Streakly',
           style: AppTheme.appTextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppTheme.secondaryColor,
           ),
         ),
         centerTitle: false,
@@ -123,7 +122,6 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             style: AppTheme.appTextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
             ),
           ),
 
@@ -133,10 +131,11 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             Text(
               _getMotivationalText(sortedHabits),
               style: AppTheme.appTextStyle(
-                fontSize: 16,
-                color: AppTheme.secondaryColor.withOpacity(0.7),
+                fontSize: 12,
+                color: Colors.black.withOpacity(0.7),
               ),
             ),
+
             const SizedBox(height: 24),
           ] else ...[
             const SizedBox(height: 16),
@@ -164,10 +163,12 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                       child: Row(
                         children: [
                           Icon(Icons.edit_outlined, color: Colors.blue.shade700),
+
                           const SizedBox(width: 8),
+
                           Text(
                             'Edit',
-                            style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w600),
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.5)),
                           ),
                         ],
                       ),
@@ -186,7 +187,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                           const SizedBox(width: 6),
                           Text(
                             'Delete',
-                            style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600),
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.5)),
                           ),
                         ],
                       ),
@@ -202,11 +203,17 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(ctx).pop(false),
-                                child: const Text('Cancel'),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.black),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.of(ctx).pop(true),
-                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ],
                           ),
@@ -321,7 +328,6 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
               style: AppTheme.appTextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -343,8 +349,13 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
               ElevatedButton.icon(
                 onPressed: () => _navigateToCreateHabit(context),
-                icon: const Icon(Icons.add),
-                label: const Text('Create First Habit'),
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: Text(
+                    'Create First Habit',
+                    style: AppTheme.appTextStyle(
+                      color: Colors.white,
+                    ),
+                ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),

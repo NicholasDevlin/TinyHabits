@@ -14,7 +14,7 @@ class NotificationService {
   static const String _habitChannelId = 'habit_reminders';
   static const String _habitChannelName = 'Habit Reminders';
   static const String _habitChannelDescription = 'Scheduled reminders for your habits';
-  static const Color _primaryColor = Color(0xFF85D8EA);
+  static const Color _primaryColor = Color(0xFFBC6F0F);
   static final Int64List _vibrationPattern = Int64List.fromList([0, 1000, 500, 1000]);
 
   static Future<void> initialize({Function(int habitId, String action)? onHabitActionCallback}) async {

@@ -18,6 +18,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  bool _hasInteracted = false;
 
   TimeOfDay _selectedTime = TimeOfDay.now();
   Set<int> _selectedDays = <int>{};
@@ -36,21 +37,18 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   void initState() {
     super.initState();
 
-    // If editing an existing habit, populate the form
     if (widget.habit != null) {
       _titleController.text = widget.habit!.title;
       if (widget.habit!.description != null) {
         _descriptionController.text = widget.habit!.description!;
       }
 
-      // Parse reminder time
       final timeParts = widget.habit!.reminderTime.split(':');
       _selectedTime = TimeOfDay(
         hour: int.parse(timeParts[0]),
         minute: int.parse(timeParts[1]),
       );
 
-      // Set selected days
       _selectedDays = widget.habit!.targetDays.toSet();
     }
   }
@@ -73,7 +71,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
           style: AppTheme.appTextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: AppTheme.secondaryColor,
           ),
         ),
         leading: IconButton(
@@ -102,6 +99,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
           ),
@@ -123,7 +121,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -150,7 +147,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -171,7 +167,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -191,7 +186,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
                   children: [
                     Icon(
                       Icons.schedule,
-                      color: AppTheme.primaryColor,
+                      color: Colors.black.withOpacity(0.5),
                     ),
 
                     const SizedBox(width: 12),
@@ -200,7 +195,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
                       _formatTime(_selectedTime),
                       style: AppTheme.appTextStyle(
                         fontSize: 16,
-                        color: AppTheme.secondaryColor,
+                        color: Colors.black.withOpacity(0.5),
                       ),
                     ),
 
@@ -209,7 +204,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
                     Icon(
                       Icons.arrow_forward_ios,
                       size: 16,
-                      color: AppTheme.secondaryColor.withOpacity(0.5),
+                      color: Colors.black.withOpacity(0.5),
                     ),
                   ],
                 ),
@@ -223,7 +218,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.secondaryColor,
               ),
             ),
 
@@ -237,6 +231,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               value: _selectedDays.length == 7,
               onChanged: (value) {
                 setState(() {
+                  _hasInteracted = true;
+
                   if (value == true) {
                     _selectedDays = {1, 2, 3, 4, 5, 6, 7};
                   } else {
@@ -264,6 +260,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
                   selected: isSelected,
                   onSelected: (selected) {
                     setState(() {
+                      _hasInteracted = true;
+
                       if (selected) {
                         _selectedDays.add(dayNumber);
                       } else {
@@ -282,7 +280,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               }),
             ),
 
-            if (_selectedDays.isEmpty) ...[
+            if (_hasInteracted && _selectedDays.isEmpty) ...[
               const SizedBox(height: 8),
 
               Text(
