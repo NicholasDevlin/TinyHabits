@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:confetti/confetti.dart';
 
 import '../../../../core/app_theme.dart';
 import '../../domain/models/habit.dart';
@@ -16,17 +17,29 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late ConfettiController _confettiController;
   final Set<int> _dismissedHabitIds = <int>{};
+  bool _hasShownConfetti = false;
+  final List<MaterialColor> _confettiColors = [
+    Colors.green,
+    Colors.blue,
+    Colors.pink,
+    Colors.orange,
+    Colors.purple,
+    Colors.yellow,
+  ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _confettiController.dispose();
     _dismissedHabitIds.clear();
     super.dispose();
   }
@@ -62,11 +75,45 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Stack(
         children: [
-          _buildTodayHabits(),
-          _buildAllHabits(),
+          TabBarView(
+            controller: _tabController,
+            children: [
+              _buildTodayHabits(),
+              _buildAllHabits(),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: -3.14 / 2,
+              blastDirectionality: BlastDirectionality.explosive,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              maxBlastForce: 20,
+              minBlastForce: 8,
+              gravity: 0.2,
+              shouldLoop: false,
+              colors: _confettiColors,
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: -3.14 / 2,
+              blastDirectionality: BlastDirectionality.explosive,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              maxBlastForce: 20,
+              minBlastForce: 8,
+              gravity: 0.2,
+              shouldLoop: false,
+              colors: _confettiColors,
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -110,6 +157,10 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
     if (sortedHabits.isEmpty) {
       return _buildEmptyState(context, isTodayTab);
+    }
+
+    if (isTodayTab) {
+      _checkAndTriggerConfetti(sortedHabits);
     }
 
     return Padding(
@@ -417,6 +468,20 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
       return '$completedCount of $totalCount completed. Keep going!';
     } else {
       return 'Ready to make today count? Start with one habit.';
+    }
+  }
+
+  void _checkAndTriggerConfetti(List<Habit> habits) {
+    final completedCount = habits.where((h) => h.isCompletedToday).length;
+    final totalCount = habits.length;
+
+    if (completedCount == totalCount && totalCount > 0) {
+      if (!_hasShownConfetti) {
+        _hasShownConfetti = true;
+        _confettiController.play();
+      }
+    } else {
+      _hasShownConfetti = false;
     }
   }
 
