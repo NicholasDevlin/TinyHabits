@@ -1,4 +1,4 @@
-package com.example.tiny_wins
+package com.example.streakly
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.content.Intent
 
 class MainActivity: FlutterActivity() {
-    private val HABIT_WIDGET_CHANNEL = "com.example.tiny_wins/widget"
+    private val HABIT_WIDGET_CHANNEL = "com.example.streakly/widget"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

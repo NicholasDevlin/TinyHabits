@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:tiny_wins/main.dart';
-import 'package:tiny_wins/core/database/app_database.dart';
+import 'package:streakly/main.dart';
+import 'package:streakly/core/database/app_database.dart';
 
 void main() {
-  testWidgets('TinyWins app smoke test', (WidgetTester tester) async {
+  testWidgets('Streakly app smoke test', (WidgetTester tester) async {
     // Create a test database
     final database = AppDatabase();
 
@@ -16,12 +16,12 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(database),
         ],
-        child: const TinyWinsApp(),
+        child: const StreaklyApp(),
       ),
     );
 
     // Verify the app title appears
-    expect(find.text('TinyWins'), findsOneWidget);
+    expect(find.text('Streakly'), findsOneWidget);
 
     // Verify the empty state appears when no habits exist
     expect(find.text('Start Your Journey'), findsOneWidget);
@@ -42,7 +42,7 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(database),
         ],
-        child: const TinyWinsApp(),
+        child: const StreaklyApp(),
       ),
     );
 

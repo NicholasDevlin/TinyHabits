@@ -1,8 +1,8 @@
-# TinyWins Development Guide
+# Streakly Development Guide
 
 ## Project Overview
 
-TinyWins is a complete offline-first habit tracking application built with Flutter following clean architecture principles. The app was built according to detailed specifications for an "Atomic Habit Tracker" with modern UI design and robust functionality.
+Streakly is a complete offline-first habit tracking application built with Flutter following clean architecture principles. The app was built according to detailed specifications for an "Atomic Habit Tracker" with modern UI design and robust functionality.
 
 ## Architecture
 

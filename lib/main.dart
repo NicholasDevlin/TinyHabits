@@ -29,13 +29,13 @@ void main() async {
       overrides: [
         databaseProvider.overrideWithValue(database),
       ],
-      child: const TinyWinsApp(),
+      child: const StreaklyApp(),
     ),
   );
 }
 
-class TinyWinsApp extends ConsumerWidget {
-  const TinyWinsApp({super.key});
+class StreaklyApp extends ConsumerWidget {
+  const StreaklyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,7 +48,7 @@ class TinyWinsApp extends ConsumerWidget {
     });
 
     return MaterialApp(
-      title: 'TinyWins',
+      title: 'Streakly',
       theme: AppTheme.lightTheme,
       home: widgetInit.when(
         data: (_) => const HomePage(),

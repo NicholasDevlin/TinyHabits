@@ -8,7 +8,7 @@ import '../../domain/repositories/habit_widget_repository.dart';
 class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
   final AppDatabase _database;
 
-  static const String _widgetDataKey = 'tinywins_habits_widget_data';
+  static const String _widgetDataKey = 'streakly_habits_widget_data';
 
   HabitWidgetRepositoryImpl(this._database);
 

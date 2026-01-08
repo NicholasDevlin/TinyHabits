@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/habit/presentation/providers/habit_providers.dart';
 
 class WidgetActionHandler {
-  static const _channel = MethodChannel('com.example.tiny_wins/widget');
+  static const _channel = MethodChannel('com.example.streakly/widget');
   static ProviderContainer? _container;
 
   static void initialize(ProviderContainer? container) {

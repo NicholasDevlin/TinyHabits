@@ -26,7 +26,7 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'tiny_wins.db'));
+    final file = File(p.join(dbFolder.path, 'streakly.db'));
 
     return NativeDatabase.createInBackground(file);
   });

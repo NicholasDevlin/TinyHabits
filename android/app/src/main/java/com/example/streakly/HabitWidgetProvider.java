@@ -1,4 +1,4 @@
-package com.example.tiny_wins;
+package com.example.streakly;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -14,7 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HabitWidgetProvider extends AppWidgetProvider {
-    private static final String ACTION_MARK_COMPLETE = "com.example.tiny_wins.MARK_COMPLETE";
+    private static final String ACTION_MARK_COMPLETE = "com.example.streakly.MARK_COMPLETE";
     private static final String EXTRA_HABIT_ID = "habit_id";
     private static final String EXTRA_WIDGET_ID = "widget_id";
 
@@ -46,11 +46,11 @@ public class HabitWidgetProvider extends AppWidgetProvider {
 
         try {
             SharedPreferences prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE);
-            String widgetDataJson = prefs.getString("flutter.tinywins_habits_widget_data", "");
+            String widgetDataJson = prefs.getString("flutter.streakly_habits_widget_data", "");
 
             if (widgetDataJson.isEmpty()) {
                 // Fallback to the old key format if new one doesn't exist
-                widgetDataJson = prefs.getString("tinywins_habits_widget_data", "");
+                widgetDataJson = prefs.getString("streakly_habits_widget_data", "");
             }
 
             // Final fallback to old widget ID pattern
@@ -68,7 +68,7 @@ public class HabitWidgetProvider extends AppWidgetProvider {
                 int completedHabits = widgetData.getInt("completedHabits");
 
                 // Set header info with progress
-                views.setTextViewText(R.id.widget_title, "TinyWins");
+                views.setTextViewText(R.id.widget_title, "Streakly");
                 views.setTextViewText(R.id.widget_subtitle, "Today's Habits (" + completedHabits + "/" + totalHabits + ")");
 
                 // Create individual habit items
@@ -101,13 +101,13 @@ public class HabitWidgetProvider extends AppWidgetProvider {
                 }
             } else {
                 // No data available
-                views.setTextViewText(R.id.widget_title, "TinyWins");
+                views.setTextViewText(R.id.widget_title, "Streakly");
                 views.setTextViewText(R.id.widget_subtitle, "Today's Habits");
                 views.setTextViewText(R.id.habits_message, "Create your first habit!");
             }
         } catch (JSONException e) {
             // Error parsing data, show default message
-            views.setTextViewText(R.id.widget_title, "TinyWins");
+            views.setTextViewText(R.id.widget_title, "Streakly");
             views.setTextViewText(R.id.widget_subtitle, "Today's Habits");
             views.setTextViewText(R.id.habits_message, "Create your first habit!");
         }

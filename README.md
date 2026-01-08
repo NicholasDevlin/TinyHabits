@@ -1,4 +1,4 @@
-# TinyWins - Atomic Habit Tracker
+# Streakly - Atomic Habit Tracker
 
 A beautiful, offline-first habit tracking app built with Flutter following clean architecture principles.
 

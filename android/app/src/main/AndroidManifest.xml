@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tiny_wins">
+    package="com.example.streakly">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -8,9 +8,8 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    
     <application
-        android:label="TinyWins"
+        android:label="Streakly"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         
@@ -52,7 +51,7 @@
         </receiver>
 
         <!-- Widget Provider -->
-        <receiver android:name="com.example.tiny_wins.HabitWidgetProvider" android:exported="false">
+        <receiver android:name="com.example.streakly.HabitWidgetProvider" android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -61,14 +60,14 @@
         </receiver>
 
         <!-- Daily Widget Refresh Receiver -->
-        <receiver android:name="com.example.tiny_wins.WidgetRefreshScheduler$DailyRefreshReceiver" android:exported="false">
+        <receiver android:name="com.example.streakly.WidgetRefreshScheduler$DailyRefreshReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="com.example.tiny_wins.DAILY_WIDGET_REFRESH" />
+                <action android:name="com.example.streakly.DAILY_WIDGET_REFRESH" />
             </intent-filter>
         </receiver>
 
         <!-- Boot Receiver to reschedule alarms after reboot -->
-        <receiver android:name="com.example.tiny_wins.WidgetRefreshScheduler$BootReceiver" android:exported="false">
+        <receiver android:name="com.example.streakly.WidgetRefreshScheduler$BootReceiver" android:exported="false">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />

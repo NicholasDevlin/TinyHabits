@@ -1,4 +1,4 @@
-package com.example.tiny_wins;
+package com.example.streakly;
 
 import android.content.Context;
 import android.content.Intent;
@@ -70,8 +70,8 @@ public class DailyWidgetRefreshWorker extends Worker {
                     "FlutterSharedPreferences", Context.MODE_PRIVATE
                 );
                 android.content.SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("flutter.tinywins_habits_widget_data", todayHabits.toString());
-                editor.putString("tinywins_habits_widget_data", todayHabits.toString());
+                editor.putString("flutter.streakly_habits_widget_data", todayHabits.toString());
+                editor.putString("streakly_habits_widget_data", todayHabits.toString());
                 editor.apply();
 
                 Log.d(TAG, "Successfully refreshed widget data from database without Flutter!");

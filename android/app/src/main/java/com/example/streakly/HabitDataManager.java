@@ -1,4 +1,4 @@
-package com.example.tiny_wins;
+package com.example.streakly;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,7 +17,7 @@ import java.util.Locale;
 public class HabitDataManager {
     private static final String TAG = "HabitDataManager";
     private static final String PREFS_NAME = "FlutterSharedPreferences";
-    private static final String WIDGET_DATA_KEY = "flutter.tinywins_habits_widget_data";
+    private static final String WIDGET_DATA_KEY = "flutter.streakly_habits_widget_data";
     private static final String LAST_RESET_DATE_KEY = "flutter.last_habit_reset_date";
 
     /**

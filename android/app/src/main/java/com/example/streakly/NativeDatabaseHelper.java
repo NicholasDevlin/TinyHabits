@@ -1,4 +1,4 @@
-package com.example.tiny_wins;
+package com.example.streakly;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -20,7 +20,7 @@ import java.util.Locale;
  */
 public class NativeDatabaseHelper {
     private static final String TAG = "NativeDatabaseHelper";
-    private static final String DB_NAME = "tiny_wins.db";
+    private static final String DB_NAME = "streakly.db";
 
     /**
      * Get today's habits directly from SQLite database (without Flutter)

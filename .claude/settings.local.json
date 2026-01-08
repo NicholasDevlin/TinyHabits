@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Get-Content \"d:\\Project\\TinyWins\\lib\\features\\habit\\presentation\\pages\\home_page.dart\")",
+      "Bash(Get-Content \"d:\\Project\\Streakly\\lib\\features\\habit\\presentation\\pages\\home_page.dart\")",
       "Bash(flutter devices:*)",
       "Bash(flutter run:*)",
       "Bash(cmd:*)"

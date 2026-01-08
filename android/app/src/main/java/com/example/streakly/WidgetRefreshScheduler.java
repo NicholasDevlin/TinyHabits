@@ -1,4 +1,4 @@
-package com.example.tiny_wins;
+package com.example.streakly;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class WidgetRefreshScheduler {
     private static final String TAG = "WidgetRefreshScheduler";
-    private static final String DAILY_REFRESH_ACTION = "com.example.tiny_wins.DAILY_WIDGET_REFRESH";
+    private static final String DAILY_REFRESH_ACTION = "com.example.streakly.DAILY_WIDGET_REFRESH";
     private static final String WORK_TAG = "daily_widget_refresh";
     private static final int ALARM_REQUEST_CODE = 12345;
 

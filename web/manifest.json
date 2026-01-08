@@ -1,6 +1,6 @@
 {
-    "name": "tiny_wins",
-    "short_name": "tiny_wins",
+    "name": "streakly",
+    "short_name": "streakly",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

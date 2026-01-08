@@ -11,8 +11,8 @@ import '../../features/habit/domain/models/habit_widget.dart';
 class SimpleWidgetService {
   final HabitWidgetRepository _widgetRepository;
   bool _isInitialized = false;
-  static const String _widgetDataKey = 'tinywins_habits_widget_data';
-  static const MethodChannel _widgetChannel = MethodChannel('com.example.tiny_wins/widget');
+  static const String _widgetDataKey = 'streakly_habits_widget_data';
+  static const MethodChannel _widgetChannel = MethodChannel('com.example.streakly/widget');
 
   // Singleton instance
   static SimpleWidgetService? _instance;
@@ -104,7 +104,7 @@ class SimpleWidgetService {
       await HomeWidget.updateWidget(
         name: 'HabitHomeWidget',
         androidName: 'HabitWidgetProvider',
-        iOSName: 'TinyWinsWidget',
+        iOSName: 'StreaklyWidget',
       );
 
       // Also update the repository's data
