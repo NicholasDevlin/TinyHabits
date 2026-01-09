@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../../../core/app_theme.dart';
+import '../../../../core/utils/localization_extensions.dart';
 import '../providers/habit_providers.dart';
 import '../../domain/models/habit.dart';
 
@@ -18,26 +20,27 @@ class HabitDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final habitAsync = ref.watch(habitProvider(habitId));
     final completedDatesAsync = ref.watch(habitCompletedDatesProvider(habitId));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         title: habitAsync.when(
           data: (habit) => Text(
-            habit?.title ?? 'Habit Details',
+            habit?.title ?? l10n.habitDetails,
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           loading: () => Text(
-            'Loading...',
+            l10n.loading,
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           error: (_, __) => Text(
-            'Error',
+            l10n.error,
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -57,7 +60,7 @@ class HabitDetailPage extends ConsumerWidget {
       body: habitAsync.when(
         data: (habit) {
           if (habit == null) {
-            return _buildErrorState('Habit not found');
+            return _buildErrorState(context, l10n.habitNotFound);
           }
 
           return _buildHabitDetail(context, ref, habit, completedDatesAsync);
@@ -65,7 +68,7 @@ class HabitDetailPage extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppTheme.primaryColor),
         ),
-        error: (error, _) => _buildErrorState(error.toString()),
+        error: (error, _) => _buildErrorState(context, error.toString()),
       ),
     );
   }
@@ -76,6 +79,8 @@ class HabitDetailPage extends ConsumerWidget {
     Habit habit,
     AsyncValue<List<DateTime>> completedDatesAsync,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -122,7 +127,7 @@ class HabitDetailPage extends ConsumerWidget {
                           const SizedBox(width: 8),
 
                           Text(
-                            'Reminder at ${habit.reminderTime}',
+                            l10n.reminderAt(habit.reminderTime),
                             style: AppTheme.appTextStyle(
                               fontSize: 14,
                               color: Colors.black.withOpacity(0.7),
@@ -143,7 +148,7 @@ class HabitDetailPage extends ConsumerWidget {
                           const SizedBox(width: 8),
 
                           Text(
-                            _formatTargetDays(habit.targetDays),
+                            _formatTargetDays(context, habit.targetDays),
                             style: AppTheme.appTextStyle(
                               fontSize: 14,
                               color: Colors.black.withOpacity(0.7),
@@ -161,7 +166,7 @@ class HabitDetailPage extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Statistics',
+            l10n.statistics,
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -174,9 +179,10 @@ class HabitDetailPage extends ConsumerWidget {
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'Current Streak',
+                  context,
+                  l10n.currentStreak,
                   '${habit.currentStreak}',
-                  'days',
+                  l10n.days,
                   '🔥',
                   null,
                 ),
@@ -186,9 +192,10 @@ class HabitDetailPage extends ConsumerWidget {
 
               Expanded(
                 child: _buildStatCard(
-                  'Total Completed',
+                  context,
+                  l10n.totalCompleted,
                   '${habit.totalCompletions}',
-                  'times',
+                  l10n.times,
                   Icons.check_circle,
                   AppTheme.successColor,
                 ),
@@ -199,7 +206,7 @@ class HabitDetailPage extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Calendar',
+            l10n.calendar,
             style: AppTheme.appTextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -213,7 +220,7 @@ class HabitDetailPage extends ConsumerWidget {
             loading: () => const Center(
               child: CircularProgressIndicator(color: AppTheme.primaryColor),
             ),
-            error: (error, _) => _buildErrorState('Failed to load calendar'),
+            error: (error, _) => _buildErrorState(context, l10n.failedToLoadCalendar),
           ),
         ],
       ),
@@ -221,6 +228,7 @@ class HabitDetailPage extends ConsumerWidget {
   }
 
   Widget _buildStatCard(
+    BuildContext context,
     String title,
     String value,
     String unit,
@@ -366,7 +374,9 @@ class HabitDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(String message) {
+  Widget _buildErrorState(BuildContext context, String message) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -382,7 +392,7 @@ class HabitDetailPage extends ConsumerWidget {
             const SizedBox(height: 16),
 
             Text(
-              'Oops!',
+              l10n.oops,
               style: AppTheme.appTextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -406,68 +416,73 @@ class HabitDetailPage extends ConsumerWidget {
     );
   }
 
-  String _formatTargetDays(List<int> targetDays) {
+  String _formatTargetDays(BuildContext context, List<int> targetDays) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (targetDays.length == 7) {
-      return 'Every day';
+      return l10n.everyDay;
     }
 
-    final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final selectedDays = targetDays.map((day) => dayNames[day - 1]).join(', ');
+    final selectedDays = targetDays.map((day) => l10n.dayNamesShort[day - 1]).join(', ');
 
     return selectedDays;
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(
-          'Delete Habit',
+          l10n.deleteHabit,
           style: AppTheme.appTextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          'Are you sure you want to delete this habit? This action cannot be undone.',
+          l10n.deleteHabitConfirmation,
           style: AppTheme.appTextStyle(),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.black),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.black),
             ),
           ),
 
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(dialogContext).pop(); // Close dialog
               Navigator.of(context).pop(); // Go back to previous screen
 
               try {
                 await ref.read(habitControllerProvider.notifier).deleteHabit(habitId);
 
                 if (context.mounted) {
+                  final l10nAfter = AppLocalizations.of(context)!;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Habit deleted successfully'),
+                    SnackBar(
+                      content: Text(l10nAfter.habitDeletedSuccessfully),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
                 }
               } catch (error) {
                 if (context.mounted) {
+                  final l10nError = AppLocalizations.of(context)!;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Failed to delete habit: $error'),
+                      content: Text(l10nError.failedToDeleteHabit(error.toString())),
                       backgroundColor: AppTheme.errorColor,
                     ),
                   );
                 }
               }
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],

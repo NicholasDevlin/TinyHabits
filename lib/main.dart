@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'l10n/app_localizations.dart';
 
 import 'core/app_theme.dart';
+import 'core/providers/locale_provider.dart';
 import 'features/habit/presentation/pages/home_page.dart';
 import 'core/database/app_database.dart';
 import 'core/services/notification_service.dart';
@@ -39,26 +42,30 @@ class StreaklyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize simple widget service
-    final widgetInit = ref.watch(simpleWidgetInitializationProvider);
+    // Watch the current locale
+    final locale = ref.watch(localeProvider);
 
-    // Initialize widget action handler with provider container
+    // Initialize widget service in background (non-blocking)
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize widget action handler with provider container
       WidgetActionHandler.initialize(ProviderScope.containerOf(context));
+      
+      // Initialize widget service asynchronously without blocking UI
+      ref.read(simpleWidgetInitializationProvider);
     });
 
     return MaterialApp(
       title: 'Streakly',
       theme: AppTheme.lightTheme,
-      home: widgetInit.when(
-        data: (_) => const HomePage(),
-        loading: () => const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-        error: (error, stack) => const HomePage(), // Still show app if widget fails
-      ),
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

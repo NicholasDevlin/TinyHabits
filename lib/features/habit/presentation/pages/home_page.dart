@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../../../core/app_theme.dart';
+import '../../../../core/providers/locale_provider.dart';
 import '../../domain/models/habit.dart';
 import '../providers/habit_providers.dart';
 import '../widgets/habit_card.dart';
@@ -46,16 +48,61 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = ref.watch(localeProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Streakly',
+          l10n.appTitle,
           style: AppTheme.appTextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: false,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  ref.read(localeProvider.notifier).toggleLocale();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.language,
+                        color: AppTheme.primaryColor,
+                        size: 20,
+                      ),
+
+                      const SizedBox(width: 6),
+
+                      Text(
+                        currentLocale.languageCode.toUpperCase(),
+                        style: AppTheme.appTextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppTheme.primaryColor,
@@ -69,9 +116,9 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             fontSize: 16,
             fontWeight: FontWeight.w400,
           ),
-          tabs: const [
-            Tab(text: 'Today'),
-            Tab(text: 'All'),
+          tabs: [
+            Tab(text: l10n.todayTab),
+            Tab(text: l10n.allTab),
           ],
         ),
       ),
@@ -152,6 +199,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   }
 
   Widget _buildHabitsList(BuildContext context, WidgetRef ref, List<Habit> habits, {required bool isTodayTab}) {
+    final l10n = AppLocalizations.of(context)!;
     final visibleHabits = habits.where((habit) => !_dismissedHabitIds.contains(habit.id)).toList();
     final sortedHabits = _sortHabitsByReminderTime(visibleHabits);
 
@@ -169,7 +217,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isTodayTab ? 'Today' : 'All',
+            isTodayTab ? l10n.todayHeader : l10n.allHeader,
             style: AppTheme.appTextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w600,
@@ -180,7 +228,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
           if (isTodayTab) ...[
             Text(
-              _getMotivationalText(sortedHabits),
+              _getMotivationalText(context, sortedHabits),
               style: AppTheme.appTextStyle(
                 fontSize: 12,
                 color: Colors.black.withOpacity(0.7),
@@ -218,7 +266,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                           const SizedBox(width: 8),
 
                           Text(
-                            'Edit',
+                            AppLocalizations.of(context)!.edit,
                             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.5)),
                           ),
                         ],
@@ -237,33 +285,35 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                           Icon(Icons.delete_outline, color: Colors.red.shade700),
                           const SizedBox(width: 6),
                           Text(
-                            'Delete',
+                            AppLocalizations.of(context)!.delete,
                             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.5)),
                           ),
                         ],
                       ),
                     ),
                     confirmDismiss: (direction) async {
+                      final l10n = AppLocalizations.of(context)!;
+
                       if (direction == DismissDirection.endToStart) {
                         // Delete action
                         return await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('Delete habit?'),
-                            content: Text('Are you sure you want to delete "${habit.title}"?'),
+                            title: Text(l10n.deleteHabitTitle),
+                            content: Text(l10n.deleteHabitMessage(habit.title)),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(ctx).pop(false),
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.black),
+                                child: Text(
+                                  l10n.cancel,
+                                  style: const TextStyle(color: Colors.black),
                                 ),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.of(ctx).pop(true),
-                                child: const Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
+                                child: Text(
+                                    l10n.delete,
+                                    style: const TextStyle(color: Colors.red),
                                 ),
                               ),
                             ],
@@ -277,6 +327,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                     },
                     onDismissed: (direction) async {
                       if (direction == DismissDirection.endToStart) {
+                        final l10n = AppLocalizations.of(context)!;
                         final deletedHabit = habit; // Keep a copy for undo
 
                         // Immediately remove the widget from the list to prevent Dismissible errors
@@ -288,7 +339,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Deleting "${deletedHabit.title}"...'),
+                            content: Text(l10n.deletingHabit(deletedHabit.title)),
                             backgroundColor: Colors.blue.shade400,
                             duration: const Duration(seconds: 2),
                           ),
@@ -299,15 +350,16 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                           await ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
                           if (!context.mounted) return;
 
+                          final l10nAfter = AppLocalizations.of(context)!;
                           // Update the snackbar with success message and undo option
                           ScaffoldMessenger.of(context).hideCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Deleted "${deletedHabit.title}"'),
+                              content: Text(l10nAfter.deletedHabit(deletedHabit.title)),
                               backgroundColor: Colors.red.shade400,
                               duration: const Duration(seconds: 4),
                               action: SnackBarAction(
-                                label: 'UNDO',
+                                label: l10nAfter.undo,
                                 textColor: Colors.white,
                                 onPressed: () {
                                   // Recreate the habit using its previous fields
@@ -330,10 +382,11 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
                           if (!context.mounted) return;
 
+                          final l10nError = AppLocalizations.of(context)!;
                           ScaffoldMessenger.of(context).hideCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Failed to delete: $e'),
+                              content: Text(l10nError.failedToDelete(e.toString())),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -360,6 +413,8 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   }
 
   Widget _buildEmptyState(BuildContext context, bool isTodayTab) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -375,7 +430,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             const SizedBox(height: 24),
 
             Text(
-              isTodayTab ? 'No habits for today' : 'No habits yet',
+              isTodayTab ? l10n.noHabitsToday : l10n.noHabitsYet,
               style: AppTheme.appTextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
@@ -385,9 +440,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             const SizedBox(height: 12),
 
             Text(
-              isTodayTab
-                ? 'Enjoy your day! No habits scheduled for today.'
-                : 'Create your first habit and begin building\nconsistent, positive routines.',
+              isTodayTab ? l10n.noHabitsTodayMessage : l10n.noHabitsYetMessage,
               textAlign: TextAlign.center,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
@@ -402,7 +455,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                 onPressed: () => _navigateToCreateHabit(context),
                 icon: const Icon(Icons.add, color: Colors.white),
                 label: Text(
-                    'Create First Habit',
+                    l10n.createFirstHabit,
                     style: AppTheme.appTextStyle(
                       color: Colors.white,
                     ),
@@ -419,6 +472,8 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   }
 
   Widget _buildErrorState(BuildContext context, String error) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -434,7 +489,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             const SizedBox(height: 16),
 
             Text(
-              'Something went wrong',
+              l10n.somethingWentWrong,
               style: AppTheme.appTextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -458,16 +513,17 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
     );
   }
 
-  String _getMotivationalText(List<Habit> habits) {
+  String _getMotivationalText(BuildContext context, List<Habit> habits) {
+    final l10n = AppLocalizations.of(context)!;
     final completedCount = habits.where((h) => h.isCompletedToday).length;
     final totalCount = habits.length;
 
     if (completedCount == totalCount && totalCount > 0) {
-      return '🎉 Amazing! You\'ve completed all your habits today!';
+      return l10n.motivationalAllComplete;
     } else if (completedCount > 0) {
-      return '$completedCount of $totalCount completed. Keep going!';
+      return l10n.motivationalProgress(completedCount, totalCount);
     } else {
-      return 'Ready to make today count? Start with one habit.';
+      return l10n.motivationalStart;
     }
   }
 
@@ -490,10 +546,11 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
       await ref.read(habitControllerProvider.notifier).markHabitCompleted(habitId, isCompleted);
 
       if (context.mounted) {
+        final l10nAfter = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isCompleted ? 'Habit completed! 🎉' : 'Habit marked as incomplete',
+              isCompleted ? l10nAfter.habitCompleted : l10nAfter.habitIncomplete,
             ),
             backgroundColor: isCompleted ? AppTheme.successColor : AppTheme.secondaryColor,
             duration: const Duration(seconds: 2),
@@ -502,9 +559,10 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
       }
     } catch (error) {
       if (context.mounted) {
+        final l10nError = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating habit: $error'),
+            content: Text(l10nError.errorUpdatingHabit(error.toString())),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -555,5 +613,4 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
     final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
     return DateTime(2023, 1, 1, hour, minute); // Use dummy date for time comparison
   }
-
 }

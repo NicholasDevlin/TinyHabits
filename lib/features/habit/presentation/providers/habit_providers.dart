@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,6 +14,18 @@ part 'habit_providers.g.dart';
 Future<List<Habit>> todayHabits(TodayHabitsRef ref) async {
   final repository = ref.watch(habitRepositoryProvider);
 
+  // Keep the provider alive for 5 minutes to reduce database hits
+  ref.keepAlive();
+
+  // Auto-dispose after 5 minutes of inactivity
+  final timer = Timer(const Duration(minutes: 5), () {
+    ref.invalidateSelf();
+  });
+
+  ref.onDispose(() {
+    timer.cancel();
+  });
+
   return await repository.getHabitsForToday();
 }
 
@@ -21,6 +34,18 @@ Future<List<Habit>> todayHabits(TodayHabitsRef ref) async {
 Future<List<Habit>> allHabits(AllHabitsRef ref) async {
   final repository = ref.watch(habitRepositoryProvider);
 
+  // Keep the provider alive for 5 minutes to reduce database hits
+  ref.keepAlive();
+
+  // Auto-dispose after 5 minutes of inactivity
+  final timer = Timer(const Duration(minutes: 5), () {
+    ref.invalidateSelf();
+  });
+
+  ref.onDispose(() {
+    timer.cancel();
+  });
+
   return await repository.getAllHabits();
 }
 
@@ -28,6 +53,7 @@ Future<List<Habit>> allHabits(AllHabitsRef ref) async {
 @riverpod
 Future<Habit?> habit(HabitRef ref, int habitId) async {
   final repository = ref.watch(habitRepositoryProvider);
+
   return await repository.getHabitById(habitId);
 }
 
@@ -35,6 +61,7 @@ Future<Habit?> habit(HabitRef ref, int habitId) async {
 @riverpod
 Future<List<DateTime>> habitCompletedDates(HabitCompletedDatesRef ref, int habitId) async {
   final repository = ref.watch(habitRepositoryProvider);
+
   return await repository.getCompletedDates(habitId);
 }
 
@@ -53,17 +80,13 @@ class HabitController extends _$HabitController {
 
   // Handle habit completion from notifications
   Future<void> _handleNotificationAction(int habitId, String action) async {
-    print('DEBUG: HabitController received notification action: $action for habit: $habitId');
-
     if (action == 'complete') {
-      print('DEBUG: Marking habit $habitId as complete from notification');
       await markHabitCompleted(habitId, true);
     }
   }
 
   // Public method to complete habit from external source (like notifications)
   Future<void> completeHabitExternally(int habitId, bool isCompleted) async {
-    print('DEBUG: External call to complete habit $habitId with status: $isCompleted');
     await markHabitCompleted(habitId, isCompleted);
   }
 
@@ -108,7 +131,6 @@ class HabitController extends _$HabitController {
 
       // If habit is being marked complete, cancel today's notification and reschedule
       if (isCompleted && habit != null) {
-        print('DEBUG: Cancelling today notification and rescheduling for habit $habitId');
         await NotificationService.cancelTodayAndRescheduleNext(
           habitId: habitId,
           habitTitle: habit.title,

@@ -57,11 +57,16 @@ class HabitWidgetRepositoryImpl implements HabitWidgetRepository {
 
   @override
   Future<void> updateHabitCompletionFromWidget(int habitId, bool isCompleted) async {
-    // TODO: Implement widget habit completion functionality
-    print('Widget habit completion not fully implemented yet');
+    try {
+      // Mark habit as completed in the database
+      final today = DateTime.now();
+      await _database.habitEntriesDao.markHabitCompleted(habitId, today, isCompleted);
 
-    // Update widget after habit completion change
-    await refreshWidget();
+      // Update widget after habit completion change
+      await refreshWidget();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override

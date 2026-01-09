@@ -9,6 +9,9 @@ import 'package:timezone/data/latest.dart' as tz;
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   static bool _isInitialized = false;
+  
+  // Store the habit ID that needs navigation when app comes to foreground
+  static int? _pendingNavigationHabitId;
 
   // Constants for better maintainability
   static const String _habitChannelId = 'habit_reminders';
@@ -94,13 +97,11 @@ class NotificationService {
         final action = parts[1];
 
         if (habitId != null) {
-          await _handleNotificationAction(habitId!, action);
+          await _handleNotificationAction(habitId, action);
+          _pendingNavigationHabitId = habitId;
         }
       }
     }
-
-    // Could navigate to specific habit or open the app
-    // TODO: Implement navigation logic if needed
   }
 
   static Future<void> _handleNotificationAction(int habitId, String action) async {
@@ -128,6 +129,13 @@ class NotificationService {
   // Method to be called from HabitController to handle notification actions
   static void setHabitActionCallback(Function(int habitId, String action) callback) {
     _onHabitActionCallback = callback;
+  }
+
+  // Get and clear pending navigation habit ID
+  static int? getPendingNavigationHabitId() {
+    final habitId = _pendingNavigationHabitId;
+    _pendingNavigationHabitId = null;
+    return habitId;
   }
 
   static Future<void> scheduleHabitReminder({

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../../../core/app_theme.dart';
+import '../../../../core/utils/localization_extensions.dart';
 import '../../domain/models/habit.dart';
 import '../providers/habit_providers.dart';
 
@@ -22,16 +24,6 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
   TimeOfDay _selectedTime = TimeOfDay.now();
   Set<int> _selectedDays = <int>{};
-
-  final List<String> _dayNames = [
-    'Monday',
-    'Tuesday', 
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
 
   @override
   void initState() {
@@ -63,11 +55,12 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   @override
   Widget build(BuildContext context) {
     final habitController = ref.watch(habitControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.habit != null ? 'Edit Habit' : 'Create Habit',
+          widget.habit != null ? l10n.editHabit : l10n.createHabit,
           style: AppTheme.appTextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -95,7 +88,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               ),
             ),
             child: Text(
-              widget.habit != null ? 'Update Habit' : 'Create Habit',
+              widget.habit != null ? l10n.updateHabit : l10n.createHabit,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -109,6 +102,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -117,7 +112,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Habit Name',
+              l10n.habitName,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -128,12 +123,12 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                hintText: 'e.g., Drink 8 glasses of water',
+              decoration: InputDecoration(
+                hintText: l10n.habitNameHint,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a habit name';
+                  return l10n.pleaseEnterHabitName;
                 }
 
                 return null;
@@ -143,7 +138,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
             const SizedBox(height: 24),
 
             Text(
-              'Description (Optional)',
+              l10n.descriptionOptional,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -154,8 +149,8 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
-                hintText: 'Add motivation or details...',
+              decoration: InputDecoration(
+                hintText: l10n.descriptionHint,
               ),
               maxLines: 3,
             ),
@@ -163,7 +158,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
             const SizedBox(height: 24),
 
             Text(
-              'Reminder Time',
+              l10n.reminderTime,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -214,7 +209,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
             const SizedBox(height: 24),
 
             Text(
-              'Repeat Days',
+              l10n.repeatDays,
               style: AppTheme.appTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -225,7 +220,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
 
             CheckboxListTile(
               title: Text(
-                'Everyday',
+                l10n.everyday,
                 style: AppTheme.appTextStyle(fontWeight: FontWeight.w500),
               ),
               value: _selectedDays.length == 7,
@@ -256,7 +251,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
                 final isSelected = _selectedDays.contains(dayNumber);
 
                 return FilterChip(
-                  label: Text(_dayNames[index]),
+                  label: Text(l10n.dayNames[index]),
                   selected: isSelected,
                   onSelected: (selected) {
                     setState(() {
@@ -284,7 +279,7 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
               const SizedBox(height: 8),
 
               Text(
-                'Please select at least one day',
+                l10n.pleaseSelectAtLeastOneDay,
                 style: AppTheme.appTextStyle(
                   fontSize: 12,
                   color: AppTheme.errorColor,
@@ -328,14 +323,16 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
   }
 
   Future<void> _saveHabit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select at least one day'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectAtLeastOneDay),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -357,9 +354,10 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
         await ref.read(habitControllerProvider.notifier).updateHabit(widget.habit!.id, request);
 
         if (mounted) {
+          final l10nAfter = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Habit updated successfully! 🎉'),
+            SnackBar(
+              content: Text(l10nAfter.habitUpdatedSuccessfully),
               backgroundColor: AppTheme.successColor,
             ),
           );
@@ -369,9 +367,10 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
         await ref.read(habitControllerProvider.notifier).createHabit(request);
 
         if (mounted) {
+          final l10nAfter = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Habit created successfully! 🎉'),
+            SnackBar(
+              content: Text(l10nAfter.habitCreatedSuccessfully),
               backgroundColor: AppTheme.successColor,
             ),
           );
@@ -380,9 +379,13 @@ class _CreateHabitPageState extends ConsumerState<CreateHabitPage> {
       }
     } catch (error) {
       if (mounted) {
+        final l10nError = AppLocalizations.of(context)!;
+        final errorMessage = widget.habit != null 
+            ? l10nError.failedToUpdateHabit(error.toString())
+            : l10nError.failedToCreateHabit(error.toString());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to ${widget.habit != null ? 'update' : 'create'} habit: $error'),
+            content: Text(errorMessage),
             backgroundColor: AppTheme.errorColor,
           ),
         );

@@ -1,0 +1,365 @@
+{
+  "@@locale": "en",
+  "appTitle": "Streakly",
+  "@appTitle": {
+    "description": "The application title"
+  },
+  "todayTab": "Today",
+  "@todayTab": {
+    "description": "Today tab label"
+  },
+  "allTab": "All",
+  "@allTab": {
+    "description": "All habits tab label"
+  },
+  "todayHeader": "Today",
+  "@todayHeader": {
+    "description": "Today header text"
+  },
+  "allHeader": "All",
+  "@allHeader": {
+    "description": "All habits header text"
+  },
+  "motivationalAllComplete": "🎉 Amazing! You've completed all your habits today!",
+  "@motivationalAllComplete": {
+    "description": "Message shown when all habits are completed"
+  },
+  "motivationalProgress": "{completed} of {total} completed. Keep going!",
+  "@motivationalProgress": {
+    "description": "Message showing progress",
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "motivationalStart": "Ready to make today count? Start with one habit.",
+  "@motivationalStart": {
+    "description": "Message to start habits"
+  },
+  "noHabitsToday": "No habits for today",
+  "@noHabitsToday": {
+    "description": "Message when no habits scheduled for today"
+  },
+  "noHabitsYet": "No habits yet",
+  "@noHabitsYet": {
+    "description": "Message when no habits exist"
+  },
+  "noHabitsTodayMessage": "Take a break and come back tomorrow!",
+  "@noHabitsTodayMessage": {
+    "description": "Message for no habits today"
+  },
+  "noHabitsYetMessage": "Your journey to better habits starts here.",
+  "@noHabitsYetMessage": {
+    "description": "Message when starting fresh"
+  },
+  "createFirstHabit": "Create Your First Habit",
+  "@createFirstHabit": {
+    "description": "Button to create first habit"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "undo": "UNDO",
+  "@undo": {
+    "description": "Undo button label"
+  },
+  "deleteHabitTitle": "Delete Habit?",
+  "@deleteHabitTitle": {
+    "description": "Delete confirmation dialog title"
+  },
+  "deleteHabitMessage": "Are you sure you want to delete \"{habitTitle}\"?",
+  "@deleteHabitMessage": {
+    "description": "Delete confirmation message",
+    "placeholders": {
+      "habitTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "deletingHabit": "Deleting {habitTitle}...",
+  "@deletingHabit": {
+    "description": "Deleting in progress message",
+    "placeholders": {
+      "habitTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "deletedHabit": "Deleted {habitTitle}",
+  "@deletedHabit": {
+    "description": "Deleted success message",
+    "placeholders": {
+      "habitTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "habitCompleted": "Habit marked as complete",
+  "@habitCompleted": {
+    "description": "Habit completion message"
+  },
+  "habitIncomplete": "Habit marked as incomplete",
+  "@habitIncomplete": {
+    "description": "Habit incomplete message"
+  },
+  "errorUpdatingHabit": "Error updating habit: {error}",
+  "@errorUpdatingHabit": {
+    "description": "Error message when updating fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDelete": "Failed to delete: {error}",
+  "@failedToDelete": {
+    "description": "Error message when deletion fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "somethingWentWrong": "Something went wrong. Please try again.",
+  "@somethingWentWrong": {
+    "description": "Generic error message"
+  },
+  "createHabit": "Create Habit",
+  "@createHabit": {
+    "description": "Create habit page title"
+  },
+  "editHabit": "Edit Habit",
+  "@editHabit": {
+    "description": "Edit habit page title"
+  },
+  "updateHabit": "Update Habit",
+  "@updateHabit": {
+    "description": "Update habit button label"
+  },
+  "habitName": "Habit Name",
+  "@habitName": {
+    "description": "Habit name field label"
+  },
+  "habitNameHint": "e.g., Morning Exercise, Read for 30 minutes",
+  "@habitNameHint": {
+    "description": "Habit name field hint"
+  },
+  "descriptionOptional": "Description (Optional)",
+  "@descriptionOptional": {
+    "description": "Description field label"
+  },
+  "descriptionHint": "Add details about your habit...",
+  "@descriptionHint": {
+    "description": "Description field hint"
+  },
+  "reminderTime": "Reminder Time",
+  "@reminderTime": {
+    "description": "Reminder time field label"
+  },
+  "repeatDays": "Repeat Days",
+  "@repeatDays": {
+    "description": "Repeat days section label"
+  },
+  "everyday": "Everyday",
+  "@everyday": {
+    "description": "Everyday option label"
+  },
+  "pleaseEnterHabitName": "Please enter a habit name",
+  "@pleaseEnterHabitName": {
+    "description": "Validation message for empty habit name"
+  },
+  "pleaseSelectAtLeastOneDay": "Please select at least one day",
+  "@pleaseSelectAtLeastOneDay": {
+    "description": "Validation message for no days selected"
+  },
+  "habitCreatedSuccessfully": "Habit created successfully!",
+  "@habitCreatedSuccessfully": {
+    "description": "Success message for habit creation"
+  },
+  "habitUpdatedSuccessfully": "Habit updated successfully!",
+  "@habitUpdatedSuccessfully": {
+    "description": "Success message for habit update"
+  },
+  "failedToCreateHabit": "Failed to create habit: {error}",
+  "@failedToCreateHabit": {
+    "description": "Error message when creation fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateHabit": "Failed to update habit: {error}",
+  "@failedToUpdateHabit": {
+    "description": "Error message when update fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "monday": "Monday",
+  "@monday": {
+    "description": "Monday full name"
+  },
+  "tuesday": "Tuesday",
+  "@tuesday": {
+    "description": "Tuesday full name"
+  },
+  "wednesday": "Wednesday",
+  "@wednesday": {
+    "description": "Wednesday full name"
+  },
+  "thursday": "Thursday",
+  "@thursday": {
+    "description": "Thursday full name"
+  },
+  "friday": "Friday",
+  "@friday": {
+    "description": "Friday full name"
+  },
+  "saturday": "Saturday",
+  "@saturday": {
+    "description": "Saturday full name"
+  },
+  "sunday": "Sunday",
+  "@sunday": {
+    "description": "Sunday full name"
+  },
+  "mon": "Mon",
+  "@mon": {
+    "description": "Monday short name"
+  },
+  "tue": "Tue",
+  "@tue": {
+    "description": "Tuesday short name"
+  },
+  "wed": "Wed",
+  "@wed": {
+    "description": "Wednesday short name"
+  },
+  "thu": "Thu",
+  "@thu": {
+    "description": "Thursday short name"
+  },
+  "fri": "Fri",
+  "@fri": {
+    "description": "Friday short name"
+  },
+  "sat": "Sat",
+  "@sat": {
+    "description": "Saturday short name"
+  },
+  "sun": "Sun",
+  "@sun": {
+    "description": "Sunday short name"
+  },
+  "habitDetails": "Habit Details",
+  "@habitDetails": {
+    "description": "Habit detail page title"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error label"
+  },
+  "habitNotFound": "Habit not found",
+  "@habitNotFound": {
+    "description": "Error when habit not found"
+  },
+  "reminderAt": "Reminder at {time}",
+  "@reminderAt": {
+    "description": "Reminder time display",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics section label"
+  },
+  "currentStreak": "Current Streak",
+  "@currentStreak": {
+    "description": "Current streak label"
+  },
+  "days": "days",
+  "@days": {
+    "description": "Days unit"
+  },
+  "totalCompleted": "Total Completed",
+  "@totalCompleted": {
+    "description": "Total completed label"
+  },
+  "times": "times",
+  "@times": {
+    "description": "Times unit"
+  },
+  "calendar": "Calendar",
+  "@calendar": {
+    "description": "Calendar section label"
+  },
+  "failedToLoadCalendar": "Failed to load calendar",
+  "@failedToLoadCalendar": {
+    "description": "Error loading calendar"
+  },
+  "oops": "Oops!",
+  "@oops": {
+    "description": "Error exclamation"
+  },
+  "everyDay": "Every day",
+  "@everyDay": {
+    "description": "Every day schedule text"
+  },
+  "deleteHabit": "Delete Habit",
+  "@deleteHabit": {
+    "description": "Delete habit button label"
+  },
+  "deleteHabitConfirmation": "Are you sure you want to delete this habit? This action cannot be undone.",
+  "@deleteHabitConfirmation": {
+    "description": "Delete habit confirmation message"
+  },
+  "habitDeletedSuccessfully": "Habit deleted successfully",
+  "@habitDeletedSuccessfully": {
+    "description": "Habit deleted success message"
+  },
+  "failedToDeleteHabit": "Failed to delete habit: {error}",
+  "@failedToDeleteHabit": {
+    "description": "Error deleting habit",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dayStreak": "🔥 {days} day streak",
+  "@dayStreak": {
+    "description": "Day streak display",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "habitNotAvailableToday": "This habit isn't available",
+  "@habitNotAvailableToday": {
+    "description": "Message when habit not scheduled for today"
+  }
+}

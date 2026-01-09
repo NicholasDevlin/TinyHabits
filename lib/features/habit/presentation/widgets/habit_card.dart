@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../../../core/app_theme.dart';
 import '../../domain/models/habit.dart';
@@ -52,6 +53,7 @@ class _HabitCardState extends State<HabitCard>
   @override
   Widget build(BuildContext context) {
     final isButtonEnabled = widget.onCompleted != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Hero(
       tag: 'habit_${widget.habit.id}',
@@ -122,10 +124,10 @@ class _HabitCardState extends State<HabitCard>
                           const SizedBox(width: 16),
 
                           if (widget.habit.currentStreak > 0) ...[
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 3),
 
                             Text(
-                              '🔥 ${widget.habit.currentStreak} day streak',
+                              l10n.dayStreak(widget.habit.currentStreak),
                               style: AppTheme.appTextStyle(
                                 fontSize: 12,
                                 color: AppTheme.primaryColor,
@@ -133,10 +135,10 @@ class _HabitCardState extends State<HabitCard>
                               ),
                             ),
                           ] else if (! isButtonEnabled) ...[
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 3),
 
                             Text(
-                              "This habit isn't available for today",
+                              l10n.habitNotAvailableToday,
                               style: AppTheme.appTextStyle(
                                 fontSize: 12,
                                 color: AppTheme.primaryColor,
