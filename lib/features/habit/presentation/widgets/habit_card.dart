@@ -123,7 +123,7 @@ class _HabitCardState extends State<HabitCard>
 
                           const SizedBox(width: 16),
 
-                          if (widget.habit.currentStreak > 0) ...[
+                          if (isButtonEnabled && widget.habit.currentStreak > 0) ...[
                             const SizedBox(width: 3),
 
                             Text(

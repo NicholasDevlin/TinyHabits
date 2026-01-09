@@ -12,6 +12,7 @@ import 'core/database/app_database.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/simple_widget_service.dart';
 import 'core/services/widget_action_handler.dart';
+import 'core/services/daily_refresh_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,9 @@ class StreaklyApp extends ConsumerWidget {
       
       // Initialize widget service asynchronously without blocking UI
       ref.read(simpleWidgetInitializationProvider);
+      
+      // Initialize daily refresh service to refresh habits at midnight
+      ref.read(dailyRefreshServiceProvider);
     });
 
     return MaterialApp(
