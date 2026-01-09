@@ -73,21 +73,7 @@ final Set<int> _ongoingDeletions = <int>{};
 class HabitController extends _$HabitController {
   @override
   FutureOr<void> build() {
-    // Initialize notification service with callback for handling notification actions
-    NotificationService.setHabitActionCallback(_handleNotificationAction);
     // No initial state needed
-  }
-
-  // Handle habit completion from notifications
-  Future<void> _handleNotificationAction(int habitId, String action) async {
-    if (action == 'complete') {
-      await markHabitCompleted(habitId, true);
-    }
-  }
-
-  // Public method to complete habit from external source (like notifications)
-  Future<void> completeHabitExternally(int habitId, bool isCompleted) async {
-    await markHabitCompleted(habitId, isCompleted);
   }
 
   Future<void> createHabit(CreateHabitRequest request) async {
@@ -124,20 +110,7 @@ class HabitController extends _$HabitController {
       final repository = ref.read(habitRepositoryProvider);
       final today = DateTime.now();
 
-      // Get habit details before marking complete for notification rescheduling
-      final habit = await repository.getHabitById(habitId);
-
       await repository.markHabitCompleted(habitId, today, isCompleted);
-
-      // If habit is being marked complete, cancel today's notification and reschedule
-      if (isCompleted && habit != null) {
-        await NotificationService.cancelTodayAndRescheduleNext(
-          habitId: habitId,
-          habitTitle: habit.title,
-          reminderTime: habit.reminderTime,
-          targetDays: habit.targetDays,
-        );
-      }
 
       // Update widget after habit completion changes
       final widgetService = ref.read(simpleWidgetServiceProvider);

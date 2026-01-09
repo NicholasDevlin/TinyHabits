@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -20,13 +19,10 @@ class NotificationService {
   static const Color _primaryColor = Color(0xFFBC6F0F);
   static final Int64List _vibrationPattern = Int64List.fromList([0, 1000, 500, 1000]);
 
-  static Future<void> initialize({Function(int habitId, String action)? onHabitActionCallback}) async {
+  static Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      // Set the callback for handling habit actions
-      _onHabitActionCallback = onHabitActionCallback;
-
       tz.initializeTimeZones();
 
       await _requestPermissions();
@@ -89,46 +85,13 @@ class NotificationService {
   }
 
   static Future<void> _onNotificationTapped(NotificationResponse response) async {
-    // Parse the payload to extract habit ID and action
     if (response.payload != null && response.payload!.startsWith('habit_')) {
-      final parts = response.payload!.split(':action:');
-      if (parts.length == 2) {
-        final habitId = int.tryParse(parts[0].replaceFirst('habit_', ''));
-        final action = parts[1];
+      final habitId = int.tryParse(response.payload!.replaceFirst('habit_', ''));
 
-        if (habitId != null) {
-          await _handleNotificationAction(habitId, action);
-          _pendingNavigationHabitId = habitId;
-        }
+      if (habitId != null) {
+        _pendingNavigationHabitId = habitId;
       }
     }
-  }
-
-  static Future<void> _handleNotificationAction(int habitId, String action) async {
-    try {
-      if (action == 'mark_complete') {
-        // This will be handled by the habit controller through a global callback
-        _onHabitActionCallback?.call(habitId, 'complete');
-      } else if (action == 'skip') {
-        // Just dismiss the notification - don't do anything else
-        _onHabitActionCallback?.call(habitId, 'skip');
-      }
-    } catch (e) {
-      print('Error handling notification action: $e');
-    }
-  }
-
-  // Global callback to handle habit actions from notifications
-  static Function(int habitId, String action)? _onHabitActionCallback;
-
-  // External method to complete a habit from notification
-  static Future<void> completeHabitFromNotification(int habitId) async {
-    _onHabitActionCallback?.call(habitId, 'complete');
-  }
-
-  // Method to be called from HabitController to handle notification actions
-  static void setHabitActionCallback(Function(int habitId, String action) callback) {
-    _onHabitActionCallback = callback;
   }
 
   // Get and clear pending navigation habit ID
@@ -202,7 +165,7 @@ class NotificationService {
         'Time for your habit! 🎯',
         _getNextOccurrence(dayOfWeek, hour, minute),
         _buildNotificationDetails(),
-        payload: 'habit_$habitId:action_complete,habit_$habitId:action_skip',
+        payload: 'habit_$habitId',
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -224,18 +187,6 @@ class NotificationService {
         category: AndroidNotificationCategory.reminder,
         fullScreenIntent: true,
         visibility: NotificationVisibility.public,
-        actions: [
-          const AndroidNotificationAction(
-            'mark_complete',
-            'Mark Complete',
-            showsUserInterface: true,
-          ),
-          const AndroidNotificationAction(
-            'skip',
-            'Skip',
-            showsUserInterface: true,
-          ),
-        ],
       ),
     );
   }
@@ -262,96 +213,8 @@ class NotificationService {
       targetDays: targetDays,
       isCompletedToday: isCompletedToday,
     );
-    try {
-    } catch (e) {
-      rethrow; // Let the caller handle this since rescheduling is critical
-    }
   }
 
-  /// Cancel today's notification for a specific habit and reschedule for next target day
-  static Future<void> cancelTodayAndRescheduleNext({
-    required int habitId,
-    required String habitTitle,
-    required String reminderTime,
-    required List<int> targetDays,
-  }) async {
-    try {
-      if (!_isInitialized) await initialize();
-
-      // Cancel today's notification only
-      await _cancelTodayNotification(habitId);
-
-      // Reschedule for next target day
-      await _scheduleNextTargetDay(
-        habitId: habitId,
-        habitTitle: habitTitle,
-        reminderTime: reminderTime,
-        targetDays: targetDays,
-      );
-    } catch (e) {
-      print('Error in cancelTodayAndRescheduleNext: $e');
-      rethrow;
-    }
-  }
-
-  /// Cancel today's notification for a specific habit
-  static Future<void> _cancelTodayNotification(int habitId) async {
-    final now = DateTime.now();
-    final todayWeekday = now.weekday; // 1=Monday, 7=Sunday
-    final todayNotificationId = _generateNotificationId(habitId, todayWeekday);
-
-    await _notifications.cancel(todayNotificationId);
-  }
-
-  /// Schedule the next target day notification (excluding today)
-  static Future<void> _scheduleNextTargetDay({
-    required int habitId,
-    required String habitTitle,
-    required String reminderTime,
-    required List<int> targetDays,
-  }) async {
-    final timeParts = _parseReminderTime(reminderTime);
-
-    // Find the next target day (excluding today)
-    final nextTargetDay = _findNextTargetDay(targetDays);
-
-    if (nextTargetDay != null) {
-      final notificationId = _generateNotificationId(habitId, nextTargetDay);
-
-      await _notifications.zonedSchedule(
-        notificationId,
-        habitTitle,
-        'Time for your habit! 🎯',
-        _getNextOccurrence(nextTargetDay, timeParts.hour, timeParts.minute),
-        _buildNotificationDetails(),
-        payload: 'habit_$habitId:action_complete,habit_$habitId:action_skip',
-        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      );
-    } else {
-      print('No more target days found for habit $habitId in this week');
-    }
-  }
-
-  /// Find the next target day from today's date (excluding today)
-  static int? _findNextTargetDay(List<int> targetDays) {
-    final now = DateTime.now();
-    int currentWeekday = now.weekday; // 1=Monday, 7=Sunday
-
-    // Sort target days to ensure proper order
-    final sortedTargetDays = List<int>.from(targetDays)..sort();
-
-    // Search for the next target day in the current week
-    for (int i = 0; i < 7; i++) {
-      currentWeekday = currentWeekday % 7 + 1; // Move to next day (1-7)
-
-      if (sortedTargetDays.contains(currentWeekday)) {
-        return currentWeekday;
-      }
-    }
-
-    return null; // No target days found
-  }
 
   static int _generateNotificationId(int habitId, int dayOfWeek) {
     return habitId * 10 + dayOfWeek;
