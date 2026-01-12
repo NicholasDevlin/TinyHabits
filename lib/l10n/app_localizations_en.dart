@@ -260,4 +260,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get habitNotAvailableToday => 'This habit isn\'t available';
+
+  @override
+  String get tutorialWelcomeTitle => 'Welcome to Streakly! 👋';
+
+  @override
+  String get tutorialWelcomeDescription =>
+      'Build better habits, one day at a time. Let\'s take a quick tour to get you started!';
+
+  @override
+  String get tutorialCreateTitle => 'Create Your First Habit';
+
+  @override
+  String get tutorialCreateDescription =>
+      'Tap the + button to create a new habit. Set a name, reminder time, and choose which days you want to track it.';
+
+  @override
+  String get tutorialSwipeLeftTitle => 'Swipe Left to Edit ✏️';
+
+  @override
+  String get tutorialSwipeLeftDescription =>
+      'Swipe any habit card from left to right to quickly edit its details, reminder time, or schedule.';
+
+  @override
+  String get tutorialSwipeRightTitle => 'Swipe Right to Delete 🗑️';
+
+  @override
+  String get tutorialSwipeRightDescription =>
+      'Swipe any habit card from right to left to delete it. Don\'t worry, we\'ll ask for confirmation first!';
+
+  @override
+  String get tutorialCompleteTitle => 'You\'re All Set! 🎉';
+
+  @override
+  String get tutorialCompleteDescription =>
+      'Tap on a habit card to mark it complete and build your streak. Ready to start your journey?';
+
+  @override
+  String get tutorialNext => 'Next';
+
+  @override
+  String get tutorialBack => 'Back';
+
+  @override
+  String get tutorialSkip => 'Skip';
+
+  @override
+  String get tutorialGetStarted => 'Get Started';
+
+  @override
+  String get tutorialSwipeCard => 'Habit Card';
 }

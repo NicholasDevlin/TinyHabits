@@ -553,6 +553,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This habit isn\'t available'**
   String get habitNotAvailableToday;
+
+  /// Tutorial welcome title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Streakly! 👋'**
+  String get tutorialWelcomeTitle;
+
+  /// Tutorial welcome description
+  ///
+  /// In en, this message translates to:
+  /// **'Build better habits, one day at a time. Let\'s take a quick tour to get you started!'**
+  String get tutorialWelcomeDescription;
+
+  /// Tutorial create habit title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your First Habit'**
+  String get tutorialCreateTitle;
+
+  /// Tutorial create habit description
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to create a new habit. Set a name, reminder time, and choose which days you want to track it.'**
+  String get tutorialCreateDescription;
+
+  /// Tutorial swipe left title
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe Left to Edit ✏️'**
+  String get tutorialSwipeLeftTitle;
+
+  /// Tutorial swipe left description
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe any habit card from left to right to quickly edit its details, reminder time, or schedule.'**
+  String get tutorialSwipeLeftDescription;
+
+  /// Tutorial swipe right title
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe Right to Delete 🗑️'**
+  String get tutorialSwipeRightTitle;
+
+  /// Tutorial swipe right description
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe any habit card from right to left to delete it. Don\'t worry, we\'ll ask for confirmation first!'**
+  String get tutorialSwipeRightDescription;
+
+  /// Tutorial complete title
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re All Set! 🎉'**
+  String get tutorialCompleteTitle;
+
+  /// Tutorial complete description
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on a habit card to mark it complete and build your streak. Ready to start your journey?'**
+  String get tutorialCompleteDescription;
+
+  /// Tutorial next button
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tutorialNext;
+
+  /// Tutorial back button
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get tutorialBack;
+
+  /// Tutorial skip button
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tutorialSkip;
+
+  /// Tutorial get started button
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get tutorialGetStarted;
+
+  /// Tutorial swipe card placeholder text
+  ///
+  /// In en, this message translates to:
+  /// **'Habit Card'**
+  String get tutorialSwipeCard;
 }
 
 class _AppLocalizationsDelegate

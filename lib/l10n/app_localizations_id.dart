@@ -262,4 +262,54 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get habitNotAvailableToday => 'Kebiasaan ini tidak tersedia';
+
+  @override
+  String get tutorialWelcomeTitle => 'Selamat Datang di Streakly! 👋';
+
+  @override
+  String get tutorialWelcomeDescription =>
+      'Bangun kebiasaan yang lebih baik, satu hari dalam satu waktu. Mari ikuti tur singkat untuk memulai!';
+
+  @override
+  String get tutorialCreateTitle => 'Buat Kebiasaan Pertama Anda';
+
+  @override
+  String get tutorialCreateDescription =>
+      'Ketuk tombol + untuk membuat kebiasaan baru. Atur nama, waktu pengingat, dan pilih hari mana Anda ingin melacaknya.';
+
+  @override
+  String get tutorialSwipeLeftTitle => 'Geser ke Kiri untuk Edit ✏️';
+
+  @override
+  String get tutorialSwipeLeftDescription =>
+      'Geser kartu kebiasaan dari kiri ke kanan untuk mengedit detail, waktu pengingat, atau jadwalnya dengan cepat.';
+
+  @override
+  String get tutorialSwipeRightTitle => 'Geser ke Kanan untuk Hapus 🗑️';
+
+  @override
+  String get tutorialSwipeRightDescription =>
+      'Geser kartu kebiasaan dari kanan ke kiri untuk menghapusnya. Jangan khawatir, kami akan meminta konfirmasi terlebih dahulu!';
+
+  @override
+  String get tutorialCompleteTitle => 'Semua Siap! 🎉';
+
+  @override
+  String get tutorialCompleteDescription =>
+      'Ketuk kartu kebiasaan untuk menandainya selesai dan membangun streak Anda. Siap memulai perjalanan Anda?';
+
+  @override
+  String get tutorialNext => 'Selanjutnya';
+
+  @override
+  String get tutorialBack => 'Kembali';
+
+  @override
+  String get tutorialSkip => 'Lewati';
+
+  @override
+  String get tutorialGetStarted => 'Mulai';
+
+  @override
+  String get tutorialSwipeCard => 'Kartu Kebiasaan';
 }

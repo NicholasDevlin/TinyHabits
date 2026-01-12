@@ -361,5 +361,65 @@
   "habitNotAvailableToday": "This habit isn't available",
   "@habitNotAvailableToday": {
     "description": "Message when habit not scheduled for today"
+  },
+  "tutorialWelcomeTitle": "Welcome to Streakly! 👋",
+  "@tutorialWelcomeTitle": {
+    "description": "Tutorial welcome title"
+  },
+  "tutorialWelcomeDescription": "Build better habits, one day at a time. Let's take a quick tour to get you started!",
+  "@tutorialWelcomeDescription": {
+    "description": "Tutorial welcome description"
+  },
+  "tutorialCreateTitle": "Create Your First Habit",
+  "@tutorialCreateTitle": {
+    "description": "Tutorial create habit title"
+  },
+  "tutorialCreateDescription": "Tap the + button to create a new habit. Set a name, reminder time, and choose which days you want to track it.",
+  "@tutorialCreateDescription": {
+    "description": "Tutorial create habit description"
+  },
+  "tutorialSwipeLeftTitle": "Swipe Left to Edit ✏️",
+  "@tutorialSwipeLeftTitle": {
+    "description": "Tutorial swipe left title"
+  },
+  "tutorialSwipeLeftDescription": "Swipe any habit card from left to right to quickly edit its details, reminder time, or schedule.",
+  "@tutorialSwipeLeftDescription": {
+    "description": "Tutorial swipe left description"
+  },
+  "tutorialSwipeRightTitle": "Swipe Right to Delete 🗑️",
+  "@tutorialSwipeRightTitle": {
+    "description": "Tutorial swipe right title"
+  },
+  "tutorialSwipeRightDescription": "Swipe any habit card from right to left to delete it. Don't worry, we'll ask for confirmation first!",
+  "@tutorialSwipeRightDescription": {
+    "description": "Tutorial swipe right description"
+  },
+  "tutorialCompleteTitle": "You're All Set! 🎉",
+  "@tutorialCompleteTitle": {
+    "description": "Tutorial complete title"
+  },
+  "tutorialCompleteDescription": "Tap on a habit card to mark it complete and build your streak. Ready to start your journey?",
+  "@tutorialCompleteDescription": {
+    "description": "Tutorial complete description"
+  },
+  "tutorialNext": "Next",
+  "@tutorialNext": {
+    "description": "Tutorial next button"
+  },
+  "tutorialBack": "Back",
+  "@tutorialBack": {
+    "description": "Tutorial back button"
+  },
+  "tutorialSkip": "Skip",
+  "@tutorialSkip": {
+    "description": "Tutorial skip button"
+  },
+  "tutorialGetStarted": "Get Started",
+  "@tutorialGetStarted": {
+    "description": "Tutorial get started button"
+  },
+  "tutorialSwipeCard": "Habit Card",
+  "@tutorialSwipeCard": {
+    "description": "Tutorial swipe card placeholder text"
   }
 }

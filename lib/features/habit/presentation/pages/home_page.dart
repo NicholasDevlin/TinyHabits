@@ -5,9 +5,11 @@ import '../../../../l10n/app_localizations.dart';
 
 import '../../../../core/app_theme.dart';
 import '../../../../core/providers/locale_provider.dart';
+import '../../../../core/services/tutorial_service.dart';
 import '../../domain/models/habit.dart';
 import '../providers/habit_providers.dart';
 import '../widgets/habit_card.dart';
+import '../widgets/tutorial_overlay.dart';
 import 'create_habit_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -30,12 +32,28 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
     Colors.purple,
     Colors.yellow,
   ];
+  bool _showTutorial = false;
+  final GlobalKey _fabKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _checkAndShowTutorial();
+  }
+
+  Future<void> _checkAndShowTutorial() async {
+    final hasCompleted = await TutorialService.hasCompletedTutorial();
+    if (!hasCompleted && mounted) {
+      // Delay to ensure the UI is fully built
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        setState(() {
+          _showTutorial = true;
+        });
+      }
+    }
   }
 
   @override
@@ -50,6 +68,25 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
+
+    return Stack(
+      children: [
+        _buildMainContent(context, l10n, currentLocale),
+        if (_showTutorial)
+          TutorialOverlay(
+            fabKey: _fabKey,
+            onComplete: () async {
+              await TutorialService.markTutorialCompleted();
+              setState(() {
+                _showTutorial = false;
+              });
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMainContent(BuildContext context, AppLocalizations l10n, Locale? currentLocale) {
 
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +126,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                       const SizedBox(width: 6),
 
                       Text(
-                        currentLocale.languageCode.toUpperCase(),
+                        (currentLocale?.languageCode ?? 'en').toUpperCase(),
                         style: AppTheme.appTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -164,6 +201,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        key: _fabKey,
         onPressed: () => _navigateToCreateHabit(context),
         child: const Icon(Icons.add),
       ),

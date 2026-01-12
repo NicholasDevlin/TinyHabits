@@ -75,5 +75,20 @@
   "habitDeletedSuccessfully": "Kebiasaan berhasil dihapus",
   "failedToDeleteHabit": "Gagal menghapus kebiasaan: {error}",
   "dayStreak": "🔥 {days} hari berturut-turut",
-  "habitNotAvailableToday": "Kebiasaan ini tidak tersedia"
+  "habitNotAvailableToday": "Kebiasaan ini tidak tersedia",
+  "tutorialWelcomeTitle": "Selamat Datang di Streakly! 👋",
+  "tutorialWelcomeDescription": "Bangun kebiasaan yang lebih baik, satu hari dalam satu waktu. Mari ikuti tur singkat untuk memulai!",
+  "tutorialCreateTitle": "Buat Kebiasaan Pertama Anda",
+  "tutorialCreateDescription": "Ketuk tombol + untuk membuat kebiasaan baru. Atur nama, waktu pengingat, dan pilih hari mana Anda ingin melacaknya.",
+  "tutorialSwipeLeftTitle": "Geser ke Kiri untuk Edit ✏️",
+  "tutorialSwipeLeftDescription": "Geser kartu kebiasaan dari kiri ke kanan untuk mengedit detail, waktu pengingat, atau jadwalnya dengan cepat.",
+  "tutorialSwipeRightTitle": "Geser ke Kanan untuk Hapus 🗑️",
+  "tutorialSwipeRightDescription": "Geser kartu kebiasaan dari kanan ke kiri untuk menghapusnya. Jangan khawatir, kami akan meminta konfirmasi terlebih dahulu!",
+  "tutorialCompleteTitle": "Semua Siap! 🎉",
+  "tutorialCompleteDescription": "Ketuk kartu kebiasaan untuk menandainya selesai dan membangun streak Anda. Siap memulai perjalanan Anda?",
+  "tutorialNext": "Selanjutnya",
+  "tutorialBack": "Kembali",
+  "tutorialSkip": "Lewati",
+  "tutorialGetStarted": "Mulai",
+  "tutorialSwipeCard": "Kartu Kebiasaan"
 }
