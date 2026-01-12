@@ -5,12 +5,21 @@ A beautiful, offline-first habit tracking app built with Flutter following clean
 ## Features
 
 - ✅ **Offline-first**: All data stored locally using Drift (SQLite)
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/1feacfc6-33c7-48d8-bf0c-6dab46ca4607" />
+
 - 🎯 **Daily habit tracking**: Mark habits as complete with satisfying animations
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/c4500e25-b793-4083-acdb-7040b241921e" />
+
 - 📊 **Statistics**: Track streaks and total completions
 - 📅 **Calendar view**: Visual progress tracking with monthly calendar
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/429ed48c-0790-4feb-bff3-58365178d10c" />
+
 - ⏰ **Smart reminders**: Customizable notification times for each habit
 - 🎨 **Modern UI**: Clean design with light cyan theme and rounded corners
-- 🏗️ **Clean Architecture**: Scalable codebase with separation of concerns
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/6af0395c-edac-43e0-8c21-9771dd18fb20" />
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/ded00e1b-1cdf-4efd-a78a-e3ff97387e64" />
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/6a92d47f-d939-49f5-85dc-229673f57b2d" />
+
 
 ## Tech Stack
 
